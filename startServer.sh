@@ -1,3 +1,3 @@
 #!/bin/sh
 
-sudo nodejs server.js
+nodejs server.js >> log.txt &
