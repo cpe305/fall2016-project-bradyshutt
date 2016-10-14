@@ -1,0 +1,25 @@
+{
+  "name": "coplan",
+  "version": "1.0.0",
+  "description": "The College Planner",
+  "main": "init.sh",
+  "scripts": {
+    "test": "mvn test",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cpe305/fall2016-project-bradyshutt.git"
+  },
+  "keywords": [
+    "planner",
+    "school",
+    "college"
+  ],
+  "author": "Brady Shutt",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cpe305/fall2016-project-bradyshutt/issues"
+  },
+  "homepage": "https://github.com/cpe305/fall2016-project-bradyshutt#readme"
+}
