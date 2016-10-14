@@ -1,0 +1,112 @@
+#!/bin/bash
+
+
+TRUE=0 #0 = true
+FALSE=1 #1 = false
+CMD=null
+SERVER_HOSTNAME="ip-172-31-10-167"
+LOG_FILE="log.txt"
+
+(sudo -n true)
+IS_ADMIN=$?
+
+main() {
+   check_args $@
+
+   case "$CMD" in
+      'start')
+         
+         if has_server_access ; then
+            start_server
+         fi 
+         ;; 
+
+      'stop')
+         
+         if has_server_access ; then
+            stop_server
+         fi
+         ;;
+
+      'start-local-server')
+         node server.js 8080
+         ;;
+
+      'restart')
+         
+         if has_server_access ; then
+            stop_server
+            start_server
+         fi
+         ;;
+
+      'status')
+         
+         if has_server_access ; then
+            server_status
+         fi
+         ;;
+
+      '*')
+         echo "Command not recognized."
+         ;;
+   esac
+   exit
+}
+
+has_server_access() {
+   if [ "$(hostname -s)" != "$SERVER_HOSTNAME" ]; then
+      echo "This command can only be run on the server."
+      return $FALSE
+   fi
+
+   if [ -e $IS_ADMIN ]; then
+      echo "This command must be run with root privileges..."
+      echo "Exiting now."
+      return $FALSE
+   fi
+   return $TRUE
+}
+
+start_server() {
+   # server_status > /dev/null
+   # if [ $? == $TRUE ] ; then
+   if server_status > /dev/null ; then #[ $? == $TRUE ] ; then
+      echo "Serving is already running..."
+      echo "Doing nothing."
+      exit
+   else
+      echo "Starting server..."
+      sudo node server.js >> $LOG_FILE &
+   fi 
+}
+
+stop_server() {
+   SPID=`sudo netstat -tulpn | grep node | awk -F ' ' '{print $7}' | awk -F '/' '{print $1}'`
+   echo "Stopping server (PID=$SPID)..."
+   sudo kill -9 $SPID
+}
+
+server_status() {
+   N_PID=`sudo netstat -tulpn | grep node | awk -F ' ' '{print $7}' | awk -F '/' '{print $1}'`
+   N_PORT=`sudo netstat -tulpn | grep node | awk -F ' ' '{print $4}' | grep -o '[0-9]*$'`
+   if [ "$N_PID" ] && [ "$N_PORT" ]; then 
+      echo "Node server is running on port $N_PORT (PID $N_PID)."
+      return $TRUE
+   else
+      echo "Server is not running."
+      return $FALSE
+   fi
+}
+
+check_args() {
+   if [ "$#" -lt 1 ]; then 
+      echo "No arguments supplied"
+      exit
+   else 
+      CMD=$1 
+   fi
+}
+
+
+main $@
