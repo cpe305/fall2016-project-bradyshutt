@@ -1,14 +1,16 @@
 'use strict'
 
 const http = require('http')
-
 const conf = require('./config.js')
+const path = require('path')
 const spawn = require('child_process').spawn
+const javaApp = spawn('java', ['-jar', path.join(conf.base, 'target/', conf.jar)])
 
-const javaApp = spawn('java', ['-cp', conf.base + 'src/main/java/com/bshutt/coursemanager/', 'App'])
-let childIsAlive = true
+javaApp.isAlive = true;
 
-console.log('java process is... ' + (childIsAlive ? 'still ': 'not ')+ 'connected!')
+console.log(path.join(conf.base, 'target'))
+
+console.log('java process is... ' + (javaApp.isAlive ? 'still ': 'not ')+ 'connected!')
 
 let buf = []
 
@@ -29,7 +31,7 @@ javaApp.stderr.on('data', (data) => {
 })
 
 javaApp.on('exit', (code, signal) => {
-   childIsAlive = false
+   javaApp.IsAlive = false
    console.log('Java App exited with code ' + code)
    console.log('sig: ' + signal)
 })
@@ -39,11 +41,11 @@ javaApp.on('error', (err) => {
    console.log(err)
 })
 
-console.log('java process is... ' + (childIsAlive ? 'still ': 'not ')+ 'connected!')
+console.log('java process is... ' + (javaApp.isAlive ? 'still ': 'not ')+ 'connected!')
 console.log('listening...')
 
 process.stdin.on('readable', () => {
-   console.log('java process is... ' + (childIsAlive ? 'still ': 'not ')+ 'connected!')
+   console.log('java process is... ' + (javaApp.isAlive ? 'still ': 'not ')+ 'connected!')
    let chunk = process.stdin.read()
    if (chunk !== null) {
       javaApp.stdin.write(chunk, 'utf8', (err) => {
