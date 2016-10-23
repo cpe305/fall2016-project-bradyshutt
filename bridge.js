@@ -4,58 +4,89 @@ const path = require('path')
 const conf = require('./config.js')
 const spawn = require('child_process').spawn
 
+let JavaApp = (onRecMsgFn) => {
 
-let buf = []
+   if (JavaApp.singleton) return JavaApp.singleton 
+   else {
 
-function JavaApp() {
-   return  JavaApp.singleton || (JavaApp.singleton = (() => {
-      let sgltn = spawn('java', ['-jar', path.join(conf.base, 'target/', conf.jar)])
-      sgltn.isAlive = true;
-      return sgltn;
-   })())
+      const javaApp = JavaApp.singleton || (JavaApp.singleton = 
+         spawn('java', ['-jar', path.join(conf.base, 'target/', conf.jar)]))
+
+      let isAlive = true
+
+      javaApp.stdout.on('data', (data) => {
+         onRecMsgFn
+            ? onRecMsgFn(data)
+            : console.log(data)
+      })
+
+      javaApp.stderr.on('data', (data) => {
+         console.log('JavaApp <ERROR> output: ')
+         console.log(data.toString())
+      })
+
+      javaApp.on('exit', (code, signal) => {
+         javaApp.isAlive = false
+         console.log(`JavaApp <EXITED>: Code[${code}] Signal:[${signal}]`)
+      })
+
+      javaApp.on('error', (err) => {
+         console.log('JavaApp <error>:')
+         console.log(err)
+      })
+
+      console.log('yohi')
+      return {
+         send(msg) {
+            javaApp.stdin.write(msg, 'utf8', (err) => {
+               if (err) throw err
+            })
+            return javaApp
+         },
+
+         onMessage(fn) {
+            javaApp.stdout.on('end', fn)
+            return javaApp
+         },
+         
+         status() {
+            console.log(javaApp.isStillAlive
+               ? 'Java is still alive'
+               : 'Java is not still alive')
+         }
+
+
+      }
+   }
 }
 
-JavaApp().stdout.on('data', (data) => {
-   console.log('Java App sent data to stdout!')
-   console.log('JavaApp says: ' + data.toString())
-   buf.push(data)
-})
+module.exports = JavaApp
 
-JavaApp().stdout.on('end', () => {
-   console.log('All data recieved')
-   console.log(buf.join(''))
-   buf = []
-})
 
-JavaApp().stderr.on('data', (data) => {
-   process.stdout.write('.')
-})
+// let jPath = path.join(conf.base, 'target/', conf.jar))
+// let java = JavaApp(jPath)
+//
 
-JavaApp().on('exit', (code, signal) => {
-   JavaApp().IsAlive = false
-   console.log('Java App exited with code ' + code)
-   console.log('sig: ' + signal)
-})
+//console.log('java process is... ' + (javaApp.isAlive ? 'still ': 'not ')+ 'connected!')
+//
+//let buf = []
+//
 
-JavaApp().on('error', (err) => {
-   console.log('Error occured...')
-   console.log(err)
-})
 
-console.log('java process is... ' + (JavaApp().isAlive ? 'still ': 'not ')+ 'connected!')
-console.log('listening...')
+//console.log('java process is... ' + (javaApp.isAlive ? 'still ': 'not ')+ 'connected!')
+//console.log('listening...')
 
-process.stdin.on('readable', () => {
-   console.log('java process is... ' + (JavaApp().isAlive ? 'still ': 'not ')+ 'connected!')
-   let chunk = process.stdin.read()
-   if (chunk !== null) {
-      JavaApp().stdin.write(chunk, 'utf8', (err) => {
-         if (err) {
-            console.error(err)
-         }
-         console.log('wrote to javaApp\'s stdin!')
-      })
-   }
-})
-
+//process.stdin.on('readable', () => {
+//   console.log('java process is... ' + (javaApp.isAlive ? 'still ': 'not ')+ 'connected!')
+//   let chunk = process.stdin.read()
+//   if (chunk !== null) {
+//      javaApp.stdin.write(chunk, 'utf8', (err) => {
+//         if (err) {
+//            console.error(err)
+//         }
+//         console.log('wrote to javaApp\'s stdin!')
+//      })
+//   }
+//})
+//
 
