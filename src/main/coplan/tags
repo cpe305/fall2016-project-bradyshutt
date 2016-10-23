@@ -1,0 +1,6 @@
+!_TAG_FILE_SORTED	2	/0=unsorted, 1=sorted, 2=foldcase/
+com.bshutt.coplan	/home/brady/school/cpe305/project/fall2016-project-bradyshutt/src/main/coplan/Driver.java	/^package com.bshutt.coplan;$/;"	p	language:Java
+Driver	/home/brady/school/cpe305/project/fall2016-project-bradyshutt/src/main/coplan/Driver.java	/^public class Driver {$/;"	c	language:Java
+JSONFormatterTest	/home/brady/school/cpe305/project/fall2016-project-bradyshutt/src/main/coplan/JSONFormatterTest.java	/^public class JSONFormatterTest {$/;"	c	language:Java
+main	/home/brady/school/cpe305/project/fall2016-project-bradyshutt/src/main/coplan/Driver.java	/^   public static void main(String[] args ) {$/;"	m	language:Java	class:Driver
+main	/home/brady/school/cpe305/project/fall2016-project-bradyshutt/src/main/coplan/JSONFormatterTest.java	/^   public static void main(String[] args) {$/;"	m	language:Java	class:JSONFormatterTest
