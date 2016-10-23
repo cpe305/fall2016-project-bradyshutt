@@ -1,6 +1,7 @@
 public class JSONFormatterTest {
 
-   public static void main(String[] args) {
+   /*public static void main(String[] args) {
+      
       JSONFormatter json = new JSONFormatter();
       json.set("name", "brady");
       json.set("age", "21");
@@ -10,7 +11,5 @@ public class JSONFormatterTest {
       String fmt2 = json.format();
       System.out.println(fmt);
 
-   }
-
-
+   }*/
 }
