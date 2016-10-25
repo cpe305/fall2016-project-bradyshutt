@@ -1,4 +1,4 @@
-package com.bshutt.coplan;
+package coplan;
 
 import java.util.Scanner;
 import java.io.BufferedInputStream;
@@ -12,6 +12,12 @@ public class Driver {
    public static void main(String[] args ) {
 
       int numCommands = 0;
+
+      JSONFormatter json = new JSONFormatter();
+      json.set("name", "Brady Shutt");
+      String fmt = json.format();
+      System.out.println("Formatted JSON:");
+      System.out.println(fmt);
 
       System.out.println("Hi, I'm the Java App!");
       InputStreamReader isReader;

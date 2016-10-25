@@ -34,5 +34,30 @@
          <version>3.8.1</version>
          <scope>test</scope>
       </dependency>
+      <!-- https://mvnrepository.com/artifact/org.json/json -->
+      <dependency>
+         <groupId>org.json</groupId>
+         <artifactId>json</artifactId>
+         <version>20160810</version>
+      </dependency>
+      <dependency>
+         <groupId>javax.json</groupId>
+         <artifactId>javax.json-api</artifactId>
+         <version>1.0</version>
+      </dependency>
+      <!-- https://mvnrepository.com/artifact/org.mongodb/mongo-java-driver -->
+      <dependency>
+         <groupId>org.mongodb</groupId>
+         <artifactId>mongo-java-driver</artifactId>
+         <version>3.2.2</version>
+      </dependency>
+      <!-- https://mvnrepository.com/artifact/org.mindrot/jbcrypt -->
+      <dependency>
+         <groupId>org.mindrot</groupId>
+         <artifactId>jbcrypt</artifactId>
+         <version>0.3m</version>
+      </dependency>
+
+
    </dependencies>
 </project>

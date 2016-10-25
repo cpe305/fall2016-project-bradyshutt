@@ -1,65 +1,58 @@
 package coplan;
 
-import java.util.Scanner;
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
 public class Driver {
-   static InputStreamReader isReader;
-   static BufferedReader bufReader;
 
    public enum Subsystem {
       USER, COURSE, OTHER
    }
 
    public static void main(String[] args ) {
-      System.out.println("Hi, I'm the Java App!");
+      System.out.println("Hi, I'm the Java App! I'm here handle all your business logic!");
+
       Router router = new Router();
-      router.listen();
+
+      Command cmd;
+      listen(router);
+//      do {
+//         cmd = new UserIAction(nextInput());
+//         System.out.println("Got a new command!");
+//         cmd.printCommand();
+//         cmd = new UserIAction(nextInput());
+//      } while (cmd != null);
    }
 
-   private static class Router {
+   static private void nextInput() {
+      BufferedReader bufferReader;
+      String command;
+      System.out.println("Listening!");
+      try {
+         bufferReader = new BufferedReader(new InputStreamReader(System.in));
+         command = bufferReader.readLine();
+      } catch (IOException e) {
+         e.printStackTrace();
+         command = null;
+      }
+   }
 
-      public Router() { }
-
-      public void listen() {
-         try {
-            bufReader = new BufferedReader(new InputStreamReader(System.in));
-            while (true) {
-               String command = null;
-               if ((command = bufReader.readLine()) != null) {
-                  route(command);
-                  System.out.println("Processing the command, " + command);
-               }
+   static void listen(Router router) {
+      BufferedReader bufferReader;
+      try {
+         bufferReader = new BufferedReader(new InputStreamReader(System.in));
+         while (true) {
+            String command = bufferReader.readLine();
+            if (command != null) {
+               System.out.println("Processing a new command!");
+               System.out.println(command);
+               //router.route(command);
             }
-         } catch (IOException e) {
-            e.printStackTrace();
          }
-
-      }
-
-      public void route(String cmd) {
-         String[] command = cmd.split(" ");
-         // Subsystem the command is intended for
-         String subsystem = command[0];
-         System.out.println(command[0]);
-         if (subsystem.equals("user")) {
-            System.out.println("Do something with the user subsystem.");
-            System.out.println("Command to do: " + cmd);
-         }
-         else if (subsystem.equals("course")) {
-            System.out.println("Do something with the course subsystem.");
-            System.out.println("Command to do: " + cmd);
-         }
-         else if (subsystem.equals("other")) {
-            System.out.println("Do something with some other subsystem.");
-            System.out.println("Command to do: " + cmd);
-         }
-         else {
-            System.out.println("Unrecognized command...");
-         }
+      } catch (IOException e) {
+         e.printStackTrace();
       }
    }
+
 }

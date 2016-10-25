@@ -14,7 +14,8 @@ let JavaApp = (onRecMsgFn) => {
 
       let isAlive = true
 
-      javaApp.stdout.on('data', (data) => {
+      javaApp.stdout.on('readable', () => {
+         let data = javaApp.stdout.read()
          onRecMsgFn
             ? onRecMsgFn(data)
             : console.log(data)
@@ -26,7 +27,7 @@ let JavaApp = (onRecMsgFn) => {
       })
 
       javaApp.on('exit', (code, signal) => {
-         javaApp.isAlive = false
+         isAlive = false
          console.log(`JavaApp <EXITED>: Code[${code}] Signal:[${signal}]`)
       })
 
@@ -50,7 +51,7 @@ let JavaApp = (onRecMsgFn) => {
          },
          
          status() {
-            console.log(javaApp.isStillAlive
+            console.log(isAlive
                ? 'Java is still alive'
                : 'Java is not still alive')
          }
