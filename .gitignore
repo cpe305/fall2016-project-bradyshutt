@@ -2,4 +2,3 @@ coplankey.pem
 *.class
 log.txt
 tags
-.mongodatabase
