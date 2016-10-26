@@ -1,60 +1,60 @@
 package coplan;
 
+import static com.mongodb.client.model.Filters.eq;
+
 import com.mongodb.client.MongoCollection;
 import junit.framework.TestCase;
 import org.bson.Document;
 import org.junit.Test;
 
-import static com.mongodb.client.model.Filters.eq;
-
 public class DatabaseTest extends TestCase {
 
-   @Test
-   public void testGetInstance() throws Exception {
-      Database database1 = Database.getInstance();
-      Database database2 = Database.getInstance();
-      assertEquals(database1, database2);
-   }
+  @Test
+  public void testGetInstance() throws Exception {
+    Database database1 = Database.getInstance();
+    Database database2 = Database.getInstance();
+    assertEquals(database1, database2);
+  }
 
-   @Test
-   public void testDocInsertionDeletion1() throws Exception {
-      Database database = Database.getInstance();
-      MongoCollection<Document> users = database.getCollection("test-collection");
+  @Test
+  public void testDocInsertionDeletion1() throws Exception {
+    Database database = Database.getInstance();
+    MongoCollection<Document> users = database.getCollection("test-collection");
 
-      Document doc = new Document("username", "bshutt")
-              .append("passwordHash", "bad-password")
-              .append("firstName", "Brady")
-              .append("lastName", "Shutt");
+    Document doc = new Document("username", "bshutt")
+        .append("passwordHash", "bad-password")
+        .append("firstName", "Brady")
+        .append("lastName", "Shutt");
 
-      users.insertOne(doc);
-      Document readDoc = users.find(eq("username", "bshutt")).first();
-      assertEquals(doc.toJson(), readDoc.toJson());
+    users.insertOne(doc);
+    Document readDoc = users.find(eq("username", "bshutt")).first();
+    assertEquals(doc.toJson(), readDoc.toJson());
 
-      users.deleteOne(eq("username","bshutt"));
-   }
+    users.deleteOne(eq("username", "bshutt"));
+  }
 
-   @Test
-   public void testGetDocument() throws Exception {
-      Database database = Database.getInstance();
-      MongoCollection<Document> users = database.getCollection("test-collection");
+  @Test
+  public void testGetDocument() throws Exception {
+    Database database = Database.getInstance();
+    MongoCollection<Document> users = database.getCollection("test-collection");
 
-      Document doc = new Document("username", "bshutt")
-              .append("passwordHash", "bad-password")
-              .append("firstName", "Brady")
-              .append("lastName", "Shutt");
+    Document doc = new Document("username", "bshutt")
+        .append("passwordHash", "bad-password")
+        .append("firstName", "Brady")
+        .append("lastName", "Shutt");
 
-      users.insertOne(doc);
-      Document readDoc = Database.getInstance().getDocument("test-collection", "username", "bshutt");
-      assertEquals(doc.toJson(), readDoc.toJson());
-      users.deleteOne(eq("username","bshutt"));
-   }
+    users.insertOne(doc);
+    Document readDoc = Database.getInstance().getDocument("test-collection", "username", "bshutt");
+    assertEquals(doc.toJson(), readDoc.toJson());
+    users.deleteOne(eq("username", "bshutt"));
+  }
 
-   public void testSetPort() throws Exception {
+  public void testSetPort() throws Exception {
 
-   }
+  }
 
-   public void testSetUrl() throws Exception {
+  public void testSetUrl() throws Exception {
 
-   }
+  }
 
 }

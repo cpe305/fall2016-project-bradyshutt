@@ -6,53 +6,59 @@ import java.io.InputStreamReader;
 
 public class Driver {
 
-   public enum Subsystem {
-      USER, COURSE, OTHER
-   }
+  public enum Subsystem {
+    USER, COURSE, OTHER
+  }
 
-   public static void main(String[] args ) {
-      System.out.println("Hi, I'm the Java App! I'm here handle all your business logic!");
+  /**
+   * Main Driver.
+   *
+   * @param args string arguments.
+   */
+  public static void main(String[] args) {
+    System.out.println("Hi, I'm the Java App! I'm here handle all your business logic!");
 
-      Router router = new Router();
+    Router router = new Router();
 
-      Command cmd;
-      listen(router);
-//      do {
-//         cmd = new UserIAction(nextInput());
-//         System.out.println("Got a new command!");
-//         cmd.printCommand();
-//         cmd = new UserIAction(nextInput());
-//      } while (cmd != null);
-   }
+    listen(router);
+    //      do {
+    //         cmd = new UserIAction(nextInput());
+    //         System.out.println("Got a new command!");
+    //         cmd.printCommand();
+    //         cmd = new UserIAction(nextInput());
+    //      } while (cmd != null);
+  }
 
-   static private void nextInput() {
-      BufferedReader bufferReader;
-      String command;
-      System.out.println("Listening!");
-      try {
-         bufferReader = new BufferedReader(new InputStreamReader(System.in));
-         command = bufferReader.readLine();
-      } catch (IOException e) {
-         e.printStackTrace();
-         command = null;
+  private static void nextInput() {
+    BufferedReader bufferReader;
+    String command;
+    System.out.println("Listening!");
+    try {
+      bufferReader = new BufferedReader(new InputStreamReader(System.in));
+      command = bufferReader.readLine();
+    } catch (IOException err) {
+      err.printStackTrace();
+      command = null;
+    }
+  }
+
+  static void listen(Router router) {
+    BufferedReader bufferReader;
+    try {
+      bufferReader = new BufferedReader(new InputStreamReader(System.in));
+      while (true) {
+        String command = bufferReader.readLine();
+        if (command != null) {
+          System.out.println("Processing a new command!");
+          System.out.println(command);
+          //router.route(command);
+        }
       }
-   }
+    } catch (IOException err) {
+      err.printStackTrace();
+    }
+  }
 
-   static void listen(Router router) {
-      BufferedReader bufferReader;
-      try {
-         bufferReader = new BufferedReader(new InputStreamReader(System.in));
-         while (true) {
-            String command = bufferReader.readLine();
-            if (command != null) {
-               System.out.println("Processing a new command!");
-               System.out.println(command);
-               //router.route(command);
-            }
-         }
-      } catch (IOException e) {
-         e.printStackTrace();
-      }
-   }
+
 
 }

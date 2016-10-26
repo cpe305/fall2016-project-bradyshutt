@@ -48,12 +48,13 @@ main() {
          ;;
 
       'startdb')
-         mongod --dbpath=.mongodatabase --port 27017
+         sudo mongod --dbpath=.mongodatabase --port 27017
          ;;
 
-      '*')
+      *)
          echo "Command not recognized."
          ;;
+
    esac
    exit
 }
@@ -108,7 +109,7 @@ check_args() {
       echo "No arguments supplied"
       exit
    else 
-      CMD=$1 
+      CMD=$1    
    fi
 }
 
