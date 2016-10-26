@@ -47,6 +47,10 @@ main() {
          fi
          ;;
 
+      'startdb')
+         mongod --dbpath=.mongodatabase --port 27017
+         ;;
+
       '*')
          echo "Command not recognized."
          ;;

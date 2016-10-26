@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuite tests="7" failures="0" name="coplan.UserTest" time="0.38" errors="0" skipped="0">
+<testsuite tests="5" failures="0" name="coplan.DatabaseTest" time="0.012" errors="0" skipped="0">
   <properties>
     <property name="idea.version" value="2016.2.4"/>
     <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
@@ -62,11 +62,9 @@
     <property name="sun.desktop" value="gnome"/>
     <property name="sun.cpu.isalist" value=""/>
   </properties>
-  <testcase classname="coplan.UserTest" name="testLogin" time="0.001"/>
-  <testcase classname="coplan.UserTest" name="testRead" time="0"/>
-  <testcase classname="coplan.UserTest" name="testRegisterThenLogin" time="0.357"/>
-  <testcase classname="coplan.UserTest" name="testDestroy" time="0"/>
-  <testcase classname="coplan.UserTest" name="testCreate" time="0"/>
-  <testcase classname="coplan.UserTest" name="testUpdate" time="0.001"/>
-  <testcase classname="coplan.UserTest" name="testUsernameIsAvailable" time="0"/>
+  <testcase classname="coplan.DatabaseTest" name="testGetDocument" time="0.009"/>
+  <testcase classname="coplan.DatabaseTest" name="testDocInsertionDeletion1" time="0.002"/>
+  <testcase classname="coplan.DatabaseTest" name="testSetPort" time="0"/>
+  <testcase classname="coplan.DatabaseTest" name="testSetUrl" time="0"/>
+  <testcase classname="coplan.DatabaseTest" name="testGetInstance" time="0"/>
 </testsuite>

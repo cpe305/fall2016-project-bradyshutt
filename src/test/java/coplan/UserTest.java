@@ -1,32 +1,52 @@
 package coplan;
 
 import junit.framework.TestCase;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
-import static com.mongodb.client.model.Filters.eq;
+import javax.xml.crypto.Data;
 
-public class UserTest extends TestCase {
+import static org.junit.Assert.*;
+
+
+public class UserTest {
 
    public void testLogin() throws Exception {
 
    }
 
+   @Test
    public void testRegisterThenLogin() throws Exception {
       // Register
-      User user1 = new User("_bshutt");
-      assertEquals(true, user1.register("badPassword", "Brady", "Shutt"));
+      User user1 = new User("bshutt");
+      assertEquals(true, user1.register("password", "Brady", "Shutt"));
       user1.create();
 
       // Login
-      User user2 = new User("_bshutt");
-      assertEquals(true, user2.login("badPassword"));
+      User user2 = new User("bshutt");
+      assertEquals(true, user2.login("password"));
       assertEquals(user1.username, user2.username);
       assertEquals(user1.firstName, user2.firstName);
       assertEquals(user1.lastName, user2.lastName);
 
-      DB.getCollection("users").drop();
+      Database db = Database.getInstance();
+      Database.getInstance().getCollection("users").drop();
    }
 
+   @Test
    public void testUsernameIsAvailable() throws Exception {
+      // Register
+      User user1 = new User("bshutt");
+      assertEquals(true, user1.register("password", "Brady", "Shutt"));
+      user1.create();
+
+      // Login
+      assertFalse(User.usernameIsAvailable("bshutt"));
+      assertTrue(User.usernameIsAvailable("valid___username"));
+
+      Database db = Database.getInstance();
+      Database.getInstance().getCollection("users").drop();
+
 
    }
 

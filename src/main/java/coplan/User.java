@@ -1,8 +1,6 @@
 package coplan;
 
-import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -18,8 +16,13 @@ public class User implements CRUD {
       this.username = username;
    }
 
-   public boolean login(String password) {
-      Document user = DB.getDocument("users", "username", this.username);
+   public boolean login(String password) throws Error {
+      Document user = Database.getInstance().getDocument("users", "username", this.username);
+      if (user == null) {
+         System.out.println("err");
+         return false;
+      }
+
       String hashed = (String) user.get("passwordHash");
       if (BCrypt.checkpw(password, hashed)) {
          this.firstName = user.getString("firstName");
@@ -42,20 +45,19 @@ public class User implements CRUD {
    }
 
    public static boolean usernameIsAvailable(String username) {
-      MongoCollection<Document> users = DB.getCollection("users");
-      Document user = users.find(eq("username", username)).first();
+      Document user = Database.getInstance()
+               .getCollection("users")
+               .find(eq("username", username))
+               .first();
       return (user == null);
    }
 
    public boolean create() {
-      DB db = DB.getInstance();
-      MongoCollection<Document> users = DB.getCollection("users");
-
+      MongoCollection<Document> users = Database.getInstance().getCollection("users");
       Document doc = new Document("username", this.username)
               .append("passwordHash", this.passwordHash)
               .append("firstName", this.firstName)
               .append("lastName", this.lastName);
-
       users.insertOne(doc);
       return true;
    }

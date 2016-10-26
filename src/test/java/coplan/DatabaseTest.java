@@ -3,20 +3,23 @@ package coplan;
 import com.mongodb.client.MongoCollection;
 import junit.framework.TestCase;
 import org.bson.Document;
+import org.junit.Test;
 
 import static com.mongodb.client.model.Filters.eq;
 
-public class DBTest extends TestCase {
+public class DatabaseTest extends TestCase {
 
+   @Test
    public void testGetInstance() throws Exception {
-      DB db1 = DB.getInstance();
-      DB db2 = DB.getInstance();
-      assertEquals(db1, db2);
+      Database database1 = Database.getInstance();
+      Database database2 = Database.getInstance();
+      assertEquals(database1, database2);
    }
 
-   public void testCollectionAccess1() throws Exception {
-      DB db = DB.getInstance();
-      MongoCollection<Document> users = db.getCollection("test-collection");
+   @Test
+   public void testDocInsertionDeletion1() throws Exception {
+      Database database = Database.getInstance();
+      MongoCollection<Document> users = database.getCollection("test-collection");
 
       Document doc = new Document("username", "bshutt")
               .append("passwordHash", "bad-password")
@@ -30,9 +33,10 @@ public class DBTest extends TestCase {
       users.deleteOne(eq("username","bshutt"));
    }
 
+   @Test
    public void testGetDocument() throws Exception {
-      DB db = DB.getInstance();
-      MongoCollection<Document> users = db.getCollection("test-collection");
+      Database database = Database.getInstance();
+      MongoCollection<Document> users = database.getCollection("test-collection");
 
       Document doc = new Document("username", "bshutt")
               .append("passwordHash", "bad-password")
@@ -40,7 +44,7 @@ public class DBTest extends TestCase {
               .append("lastName", "Shutt");
 
       users.insertOne(doc);
-      Document readDoc = DB.getDocument("test-collection", "username", "bshutt");
+      Document readDoc = Database.getInstance().getDocument("test-collection", "username", "bshutt");
       assertEquals(doc.toJson(), readDoc.toJson());
       users.deleteOne(eq("username","bshutt"));
    }
