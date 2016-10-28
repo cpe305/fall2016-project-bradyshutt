@@ -18,7 +18,7 @@ public class Driver {
   public static void main(String[] args) {
     System.out.println("Hi, I'm the Java App! I'm here handle all your business logic!");
 
-    Router router = new Router();
+    Router router = Router.getInstance();
 
     listen(router);
     //      do {
