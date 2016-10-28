@@ -1,5 +1,7 @@
 package coplan;
 
+import org.bson.Document;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -47,11 +49,11 @@ public class Driver {
     try {
       bufferReader = new BufferedReader(new InputStreamReader(System.in));
       while (true) {
-        String command = bufferReader.readLine();
-        if (command != null) {
-          System.out.println("Processing a new command!");
-          System.out.println(command);
-          //router.route(command);
+        String req = bufferReader.readLine();
+        if (req != null) {
+          //System.out.println("Processing a new command!");
+          //System.out.println(command);
+          router.route(new Request(req));
         }
       }
     } catch (IOException err) {

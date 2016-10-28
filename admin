@@ -29,7 +29,7 @@ main() {
          ;;
 
       'start-local-server')
-         node server.js 8080
+         node server/server.js 8080
          ;;
 
       'restart')

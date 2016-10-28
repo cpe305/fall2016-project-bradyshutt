@@ -2,6 +2,8 @@ package coplan;
 
 import org.bson.Document;
 
+import static org.bson.Document.parse;
+
 public class Request {
 
   private Document reqDoc;
@@ -14,7 +16,7 @@ public class Request {
   }
 
   public Request(String req) {
-    this.reqDoc = Document.parse(req);
+    this.reqDoc = parse(req);
   }
 
   public String getSubsystem() {

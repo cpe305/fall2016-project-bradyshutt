@@ -16,6 +16,8 @@ let JavaApp = (onRecMsgFn) => {
 
       javaApp.stdout.on('readable', () => {
          let data = javaApp.stdout.read()
+         console.log("\ndata:["+data+"]\n")
+         //console.log("\n["+data.toString()+"]\n")
          onRecMsgFn
             ? onRecMsgFn(data)
             : console.log(data)

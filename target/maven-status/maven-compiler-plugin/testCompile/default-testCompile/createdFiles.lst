@@ -1,0 +1,8 @@
+coplan/UserTest.class
+coplan/UserActionsTest.class
+coplan/DatabaseTest.class
+coplan/RequestTest.class
+coplan/RouterTest.class
+coplan/AppTest.class
+coplan/JsonFormatterTest.class
+coplan/JsonParserTest.class
