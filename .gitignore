@@ -4,3 +4,4 @@ log.txt
 tags
 .mongodatabase
 .idea
+.idea/*
