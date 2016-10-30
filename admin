@@ -15,14 +15,12 @@ main() {
 
    case "$CMD" in
       'start')
-         
          if has_server_access ; then
             start_server
          fi 
          ;; 
 
       'stop')
-         
          if has_server_access ; then
             stop_server
          fi
@@ -33,7 +31,6 @@ main() {
          ;;
 
       'restart')
-         
          if has_server_access ; then
             stop_server
             start_server
@@ -41,7 +38,6 @@ main() {
          ;;
 
       'status')
-         
          if has_server_access ; then
             server_status
          fi
@@ -49,6 +45,10 @@ main() {
 
       'startdb')
          sudo mongod --dbpath=.mongodatabase --port 27017
+         ;;
+
+      'jar')
+         java -jar target/coplan-1.0-SNAPSHOT.jar
          ;;
 
       *)
@@ -61,12 +61,12 @@ main() {
 
 has_server_access() {
    if [ "$(hostname -s)" != "$SERVER_HOSTNAME" ]; then
-      echo "This command can only be run on the server."
+      echo "This task can only be run on the server."
       return $FALSE
    fi
 
    if [ -e $IS_ADMIN ]; then
-      echo "This command must be run with root privileges..."
+      echo "This task must be run with root privileges..."
       echo "Exiting now."
       return $FALSE
    fi

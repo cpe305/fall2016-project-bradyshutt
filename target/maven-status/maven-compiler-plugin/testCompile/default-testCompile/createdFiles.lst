@@ -1,8 +1,8 @@
-coplan/UserTest.class
-coplan/UserActionsTest.class
-coplan/DatabaseTest.class
-coplan/RequestTest.class
-coplan/RouterTest.class
-coplan/AppTest.class
-coplan/JsonFormatterTest.class
-coplan/JsonParserTest.class
+bshutt/coplan/DatabaseTest.class
+bshutt/coplan/UserTest.class
+bshutt/coplan/JsonParserTest.class
+bshutt/coplan/RequestTest.class
+bshutt/coplan/AppTest.class
+bshutt/coplan/RouterTest.class
+bshutt/coplan/UserActionsTest.class
+bshutt/coplan/JsonFormatterTest.class
