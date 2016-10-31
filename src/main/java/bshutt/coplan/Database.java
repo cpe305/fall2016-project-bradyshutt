@@ -9,23 +9,28 @@ import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 
-class Database {
+public class Database {
 
   private static int port = 27017;
   private static String url = "localhost";
   private static String dbName = "mydb";
   private static Database instance = new Database();
 
-  public MongoClient mongo;
+  public MongoClient client;
   public MongoDatabase db;
 
   private Database() {
-    this.mongo = new MongoClient(Database.url, Database.port);
-    this.db = this.mongo.getDatabase(Database.dbName);
+    this.client = new MongoClient(Database.url, Database.port);
+    this.db = this.client.getDatabase(Database.dbName);
   }
 
   public static Database getInstance() {
     return Database.instance;
+  }
+
+  public Database changeDatabase(String dbName) {
+    this.db = this.client.getDatabase(dbName);
+    return this;
   }
 
   public MongoCollection<Document> getCollection(String collection) {

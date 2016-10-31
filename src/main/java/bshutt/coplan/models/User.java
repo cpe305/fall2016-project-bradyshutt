@@ -1,18 +1,22 @@
-package bshutt.coplan;
+package bshutt.coplan.models;
 
 import static com.mongodb.client.model.Filters.eq;
 
+import bshutt.coplan.Database;
 import com.mongodb.client.MongoCollection;
 
 import org.bson.Document;
 import org.mindrot.jbcrypt.BCrypt;
 
 
-public class User implements Crud {
-  String username;
-  String passwordHash;
-  String firstName;
-  String lastName;
+public class User {
+
+  private static UserModel model = new UserModel();
+
+  public String username;
+  public String passwordHash;
+  public String firstName;
+  public String lastName;
 
   public User(String username) {
     this.username = username;
@@ -25,12 +29,13 @@ public class User implements Crud {
    * @return True or false to whether the user logged in
    */
   public boolean login(String password) {
-    Document user = Database.getInstance().getDocument("users", "username", this.username);
+
+    User.model.getUser();
+        Document user = Database.getInstance().getDocument("users", "username", this.username);
     if (user == null) {
       System.out.println("err");
       return false;
     }
-
     String hashed = (String) user.get("passwordHash");
     if (BCrypt.checkpw(password, hashed)) {
       this.firstName = user.getString("firstName");
@@ -52,7 +57,7 @@ public class User implements Crud {
   public boolean register(String password, String firstName, String lastName) {
     this.firstName = firstName;
     this.lastName = lastName;
-    if (User.usernameIsAvailable(this.username)) {
+    if (this.model.usernameExists(this.username)) {
       this.passwordHash = BCrypt.hashpw(password, BCrypt.gensalt());
       this.create();
       return true;
@@ -60,12 +65,6 @@ public class User implements Crud {
     return false;
   }
 
-  /**
-   * Checks if username is taken or not.
-   *
-   * @param username username of the user
-   * @return whether or not it's taken...
-   */
   public static boolean usernameIsAvailable(String username) {
     Document user = Database.getInstance()
         .getCollection("users")
@@ -74,11 +73,6 @@ public class User implements Crud {
     return (user == null);
   }
 
-  /**
-   * Create user.
-   *
-   * @return whether or not it was successful.
-   */
   public boolean create() {
     MongoCollection<Document> users = Database.getInstance().getCollection("users");
     Document doc = new Document("username", this.username)
@@ -87,17 +81,5 @@ public class User implements Crud {
         .append("lastName", this.lastName);
     users.insertOne(doc);
     return true;
-  }
-
-  public Object read() {
-    return null;
-  }
-
-  public boolean update(Object update) {
-    return false;
-  }
-
-  public boolean destroy() {
-    return false;
   }
 }
