@@ -1,11 +1,16 @@
 package bshutt.coplan.models;
 
 import bshutt.coplan.Database;
+import com.mongodb.BasicDBObject;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.UpdateOneModel;
 import org.bson.Document;
 import org.bson.conversions.Bson;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public abstract class Model {
 
@@ -27,6 +32,11 @@ public abstract class Model {
     collection.insertOne(doc);
   }
 
+  public FindIterable<Document> read(String collectionName, Bson filter) {
+    FindIterable<Document> cur = this.getCollection(collectionName).find(filter);
+    return cur;
+  }
+
   public FindIterable<Document> read(MongoCollection collection, Bson filter) {
     FindIterable<Document> cur = collection.find(filter);
     return cur;
@@ -36,8 +46,17 @@ public abstract class Model {
     return this.read(collection, filter).first();
   }
 
+  public Document readOne(String collectionName, Bson filter) {
+    return this.read(this.getCollection(collectionName), filter).first();
+  }
 
-  public abstract Document update(Document query, Document updated);
-  public abstract boolean delete(Document query);
+
+  public void update(MongoCollection collection, Document filter, Document updated) {
+    collection.updateOne(filter, updated);
+  }
+
+  public void delete(MongoCollection collection, Document filter) {
+    collection.deleteOne(filter);
+  }
 
 }

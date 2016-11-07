@@ -1,9 +1,5 @@
 package bshutt.coplan;
 
-import com.mongodb.util.JSON;
-import com.mongodb.util.JSONSerializers;
-import org.bson.json.JsonReader;
-
 public class Task {
 
   public String subsystem;

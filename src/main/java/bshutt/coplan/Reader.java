@@ -3,27 +3,23 @@ package bshutt.coplan;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
-interface InputAction {
-  void act(Task task);
-}
-
-public abstract class Interpreter {
+public abstract class Reader {
 
   private InputStreamReader isr;
   private BufferedReader bufferReader;
 
-  public Interpreter() {
+  public Reader() {
     isr = new InputStreamReader(System.in);
     bufferReader = new BufferedReader(isr);
   }
 
-  void listen(InputAction action) {
+  void listen(Callback cb) {
     String nextInput;
     while (true) {
       try {
         if ((nextInput = bufferReader.readLine()) != null) {
-          Task cmd = this.interpret(nextInput);
-          action.act(cmd);
+          Request req = this.deserialize(nextInput);
+          cb.cb(req);
         }
       } catch (Exception exception) {
         System.out.println(exception);
@@ -32,6 +28,6 @@ public abstract class Interpreter {
     }
   }
 
-  public abstract Task interpret(String format) throws Exception;
+  public abstract Request deserialize(String format) throws Exception;
 
 }

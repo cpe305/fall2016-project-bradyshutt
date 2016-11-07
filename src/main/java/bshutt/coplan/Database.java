@@ -9,6 +9,9 @@ import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class Database {
 
   private static int port = 27017;
@@ -20,7 +23,10 @@ public class Database {
   public MongoDatabase db;
 
   private Database() {
-    this.client = new MongoClient(Database.url, Database.port);
+      System.setProperty("DEBUG.MONGO", "true");
+      Logger mongoLogger = Logger.getLogger( "org.mongodb.driver" );
+      mongoLogger.setLevel(Level.SEVERE);
+      this.client = new MongoClient(Database.url, Database.port);
     this.db = this.client.getDatabase(Database.dbName);
   }
 

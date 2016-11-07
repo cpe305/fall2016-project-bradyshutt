@@ -1,40 +1,43 @@
 package bshutt.coplan;
 
+import bshutt.coplan.models.User;
+import bshutt.coplan.models.UserModel;
 import org.bson.Document;
 
 import static org.bson.Document.parse;
 
 public class Request {
 
-  private Document reqDoc;
-  private Document data;
-  private String subsystem;
-  private String action;
+  public UserModel users = UserModel.getInstance();
+
+  public Document data;
+  public String route;
+  public User user;
 
   public Request(Document req) {
-    this.reqDoc = req;
+    this.route = req.getString("route");
+    this.data = (Document) req.get("data");
+  }
+
+  public Request(String route, Document data) {
+    this.route = route;
+    this.data = data;
+
   }
 
   public Request(String req) {
-    this.reqDoc = parse(req);
+    Document reqDoc = parse(req);
+    this.route = reqDoc.getString("route");
+    this.data = (Document) reqDoc.get("data");
   }
 
-  public String getSubsystem() {
-    if (this.subsystem == null)
-      this.subsystem = (String) this.reqDoc.get("subsystem");
-    return this.subsystem;
-  }
+  public String toString() {
+    return
+        "<REQ>:"
+            + "\n\tRoute: " + this.route
+            + "\n\tData: " + this.data.toJson();
 
-  public String getAction() {
-    if (this.action == null)
-      this.action = (String) this.reqDoc.get("action");
-    return this.action;
-  }
 
-  public Document getData() {
-    if (this.data == null)
-      this.data = (Document) this.reqDoc.get("data");
-    return this.data;
   }
 
 }

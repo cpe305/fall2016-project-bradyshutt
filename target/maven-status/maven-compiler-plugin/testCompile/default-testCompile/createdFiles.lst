@@ -1,8 +1,7 @@
 bshutt/coplan/DatabaseTest.class
+bshutt/coplan/ResponseTest.class
 bshutt/coplan/UserTest.class
-bshutt/coplan/JsonParserTest.class
 bshutt/coplan/RequestTest.class
 bshutt/coplan/AppTest.class
 bshutt/coplan/RouterTest.class
 bshutt/coplan/UserActionsTest.class
-bshutt/coplan/JsonFormatterTest.class
