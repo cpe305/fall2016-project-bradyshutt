@@ -1,13 +1,11 @@
 package bshutt.coplan;
 
-import static com.mongodb.client.model.Filters.eq;
-
 import com.mongodb.MongoClient;
-import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Filters;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -39,18 +37,18 @@ public class Database {
     return this;
   }
 
-  public MongoCollection<Document> getCollection(String collection) {
-    return Database.instance.db.getCollection(collection);
+  public MongoCollection<Document> col(String colName) throws DBException {
+      MongoCollection<Document> collection = this.db.getCollection(colName);
+      if (collection == null)
+          throw new DBException("Collection '" + colName + "' not found!");
+      else
+          return collection;
   }
 
-  public Document getDocument(String collection, String queryKey, String queryVal) {
-    MongoCollection<Document> coll = getCollection(collection);
-    FindIterable<Document> cur = coll.find(eq(queryKey, queryVal));
-    Document first = cur.first();
-    System.out.println(first);
-    return first;
-
+  public Bson filter(String key, String val) {
+      return Filters.eq(key, val);
   }
 
 
 }
+

@@ -36,7 +36,6 @@ let JavaApp = (onRecMsgFn) => {
          console.log(err)
       })
 
-      console.log('yohi')
       return {
          send(msg) {
             javaApp.stdin.write(msg, 'utf8', (err) => {
@@ -54,8 +53,13 @@ let JavaApp = (onRecMsgFn) => {
             console.log(isAlive
                ? 'Java is still alive'
                : 'Java is not still alive')
-         }
+         },
 
+         kill() {
+            console.log('Killing Java process')
+            javaApp.kill()
+            isAlive = false
+         }
 
       }
    }

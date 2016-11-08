@@ -27,15 +27,15 @@ public class UserModel extends Model {
   }
 
   public User loadAttributes(User user) {
-    Document userDoc = this.getUser((String) user.get("username"));
-    userDoc.forEach(user::set);
+   // Document userDoc = this.getUser((String) user.get("username"));
+    //userDoc.forEach(user::set);
     return user;
   }
 
   public void create(User user) {
-    if (usernameExists((String) user.get("username")))
-      throw new Error("That username already exists");
-    super.create(this.getCollection("users"), user.getAttributes());
+    //if (usernameExists((String) user.get("username")))
+    //  throw new Error("That username already exists");
+    //super.create(this.getCollection("users"), user.getAttributes());
   }
 
 

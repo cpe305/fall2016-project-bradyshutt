@@ -15,16 +15,21 @@ let JavaApp = (onRecMsgFn) => {
       let isAlive = true
 
       javaApp.stdout.on('readable', () => {
-         let data = javaApp.stdout.read()
-         console.log("\ndata:["+data+"]\n")
-         //console.log("\n["+data.toString()+"]\n")
-         onRecMsgFn
-            ? onRecMsgFn(data)
-            : console.log(data)
+         let data = javaApp.stdout.read().toString()
+         let json
+         if (!(json = isJson(data))) return
+         else {
+            if (onRecMsgFn)
+               onRecMsgFn(json)
+            else {
+               let pretty = JSON.stringify(json, null, 4); 
+               console.log("\nResponse:\n" + pretty.yellow + "\n")
+            }
+         }
       })
 
       javaApp.stderr.on('data', (data) => {
-         console.log('JavaApp <ERROR> output: ')
+         console.log('JavaApp threw an uncaught exception:')
          console.log(data.toString())
       })
 
@@ -38,9 +43,21 @@ let JavaApp = (onRecMsgFn) => {
          console.log(err)
       })
 
-      console.log('yohi')
+      function isJson(str) {
+         let json
+         try {
+            json = JSON.parse(str)
+         } catch (e) {
+            return false
+         }
+         return json
+      }
+
+
       return {
          send(msg) {
+            if (msg.split('\n').length === 1 || msg.split('\n')[1] === '')
+               msg += '\n'
             javaApp.stdin.write(msg, 'utf8', (err) => {
                if (err) throw err
             })
@@ -51,13 +68,16 @@ let JavaApp = (onRecMsgFn) => {
             javaApp.stdout.on('end', fn)
             return javaApp
          },
-         
+
          status() {
             console.log(isAlive
                ? 'Java is still alive'
                : 'Java is not still alive')
-         }
+         }, 
 
+         kill() { 
+            javaApp.kill()
+         }
 
       }
    }

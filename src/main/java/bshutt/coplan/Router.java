@@ -5,9 +5,6 @@ import org.bson.Document;
 import java.util.HashMap;
 import java.util.Map;
 
-interface Handler {
-    void handle(Request req, Response res);
-}
 
 public class Router {
 
@@ -23,18 +20,26 @@ public class Router {
     }
 
 
-    public void register(String key, Handler handler) {
+    public Router register(String key, Handler handler) {
         routes.put(key, handler);
+        return this;
     }
 
     public void route(Request req) {
         Response res = new Response();
-        this.routes
-                .get(req.route)
-                .handle(req, res);
-        if (!res.isDone)
-            res.end();
+        Handler handler = this.routes.get(req.route);
+        if (handler == null) {
+            res.err("No handler found for route '" + req.route, req);
+        } else {
+            handler.handle(req, res);
+            if (!res.isDone)
+                res.end();
+        }
 
+    }
+
+
+}
 
 
 //    switch (subsystem) {
@@ -57,5 +62,3 @@ public class Router {
 //      default:
 //        System.out.println("Unrecognized command...");
 //    }
-    }
-}

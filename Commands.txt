@@ -18,7 +18,6 @@ Courses.updateCourse <filter, info>
 Courses.deleteCourse <filter>
 
 
-
 example: createUser
 { 
    route: 'Users.createUser',

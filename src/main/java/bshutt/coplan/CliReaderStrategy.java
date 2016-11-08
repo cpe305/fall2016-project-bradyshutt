@@ -6,15 +6,13 @@ import org.bson.conversions.Bson;
 
 import java.util.ArrayList;
 
-public class CliReader extends Reader {
+public class CliReaderStrategy implements ReaderStrategy {
 
-    private String malformed = "Malformed input command."
-            + "\nFormat:\n\t\"<subsystem> <action> [<data>...]\"";
 
     @Override
-    public Request deserialize(String cmdString) throws Exception {
+    public Request interpret(String cmdString) {
         String[] cmdArray = cmdString.split(" ");
-        Document data;
+        Document data = null;
 
         if (cmdArray.length == 1) {
             data = null;
@@ -25,8 +23,8 @@ public class CliReader extends Reader {
             }
             data = Document.parse(dataStr);
         } else {
-            System.out.println(cmdString);
-            throw new Exception(malformed);
+            System.err.println("Malformed input command: \n" + cmdString);
+            return null;
         }
 
         Request req = new Request(
