@@ -9,8 +9,8 @@ public class Response {
     public boolean isDone = false;
 
     private static class TYPES {
-        public static String GOOD = "good";
-        public static String MSG = "message";
+        public static String GOOD = "response";
+        public static String LOG = "log";
         public static String ERR = "error";
     }
 
@@ -25,9 +25,9 @@ public class Response {
         return this;
     }
 
-    public static void msg(String message) {
+    public static void log(String message) {
         Response r = new Response();
-        r.append("type", TYPES.MSG);
+        r.append("type", TYPES.LOG);
         r.append("msg", message);
         r.end();
     }
@@ -42,7 +42,7 @@ public class Response {
 
     public Response setResponse(String msg) {
         this.doc = new Document();
-        this.doc.append("type", TYPES.MSG);
+        this.doc.append("type", TYPES.GOOD);
         this.doc.append("message", msg);
         this.end();
         return this;

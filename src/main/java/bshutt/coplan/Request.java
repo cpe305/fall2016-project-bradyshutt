@@ -1,14 +1,10 @@
 package bshutt.coplan;
 
-import bshutt.coplan.models.User;
-import bshutt.coplan.models.UserModel;
 import org.bson.Document;
 
 import static org.bson.Document.parse;
 
 public class Request {
-
-    public UserModel users = UserModel.getInstance();
 
     public String route;
     public Document data;

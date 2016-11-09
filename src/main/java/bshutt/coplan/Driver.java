@@ -1,13 +1,7 @@
 package bshutt.coplan;
 
-import bshutt.coplan.models.User;
-import bshutt.coplan.models.UserModel;
-import bshutt.coplan.models.Users;
+import bshutt.coplan.handlers.Users;
 import org.bson.Document;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 
 public class Driver {
 
@@ -31,20 +25,13 @@ public class Driver {
     }
 
     static void setupRoutes(Router router) {
-        UserModel userModel = UserModel.getInstance();
-        Database db = Database.getInstance();
-        Users users = new Users(db);
-
-//        Handler getUser = (req, res) -> {
-//            Document user = users.getUser(req.get("username"));
-//            res.setResponse(user);
-//            res.end();
-//        };
+        Users users = new Users();
 
         router.register("getUser", users.getUser);
         //.register("readUser", getUser)
         router.register("usernameIsAvailable", users.usernameIsAvailable);
         router.register("createUser", users.createUser);
+        router.register("authenticate", users.authenticate);
     }
 
 

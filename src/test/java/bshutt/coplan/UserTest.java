@@ -6,9 +6,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import bshutt.coplan.models.User;
-import org.junit.Test;
-
 
 public class UserTest {
 

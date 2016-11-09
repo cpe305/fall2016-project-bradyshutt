@@ -1,62 +1,39 @@
 package bshutt.coplan.models;
 
+import bshutt.coplan.DBException;
 import bshutt.coplan.Database;
-import com.mongodb.BasicDBObject;
-import com.mongodb.client.FindIterable;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.model.Filters;
-import com.mongodb.client.model.UpdateOneModel;
+import com.mongodb.MongoWriteException;
 import org.bson.Document;
-import org.bson.conversions.Bson;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+public abstract class Model<Type> {
 
-public abstract class Model {
+    protected Database db = Database.getInstance();
+    protected boolean existsInDB = false;
 
-  protected Database mongo;
+    public Document attributes;
 
-  public Model() {
-    this.mongo = Database.getInstance();
-  }
+    public String get(String key) {
+        return this.attributes.getString(key);
+    }
 
-  public MongoCollection getCollection(String collection) {
-    return this.mongo.db.getCollection(collection);
-  }
+    public <T> T get(String key, Class<T> type) {
+        return this.attributes.get(key, type);
+    }
 
-  public Bson getFilter(String key, String value) {
-    return Filters.eq(key, value);
-  }
+    public void set(String key, Object value) {
+        if (this.attributes.containsKey(key))
+            this.attributes.replace(key, value);
+        else
+            this.attributes.append(key, value);
+    }
 
-  public void create(MongoCollection collection, Document doc) {
-    collection.insertOne(doc);
-  }
+    public Document getAttributes() {
+        return this.attributes;
+    }
 
-  public FindIterable<Document> read(String collectionName, Bson filter) {
-    FindIterable<Document> cur = this.getCollection(collectionName).find(filter);
-    return cur;
-  }
-
-  public FindIterable<Document> read(MongoCollection collection, Bson filter) {
-    FindIterable<Document> cur = collection.find(filter);
-    return cur;
-  }
-
-  public Document readOne(MongoCollection collection, Bson filter) {
-    return this.read(collection, filter).first();
-  }
-
-  public Document readOne(String collectionName, Bson filter) {
-    return this.read(this.getCollection(collectionName), filter).first();
-  }
-
-
-  public void update(MongoCollection collection, Document filter, Document updated) {
-    collection.updateOne(filter, updated);
-  }
-
-  public void delete(MongoCollection collection, Document filter) {
-    collection.deleteOne(filter);
-  }
+    public abstract Type build(Document doc);
+    public abstract Type load(String filterVal) throws DBException;
+    public abstract void save() throws DBException;
+    public abstract boolean validate() throws DBException;
 
 }

@@ -1,51 +1,49 @@
-package bshutt.coplan.models;
+package bshutt.coplan.handlers;
 
 import bshutt.coplan.DBException;
 import bshutt.coplan.Database;
 import bshutt.coplan.Handler;
-import bshutt.coplan.Response;
+import bshutt.coplan.models.User;
+import com.mongodb.MongoWriteException;
 import org.bson.Document;
 
 import java.util.ArrayList;
 
 public class Users {
 
-    private Database db;
-    private ArrayList<Handler> handlers;
-
-    public Users(Database db) {
-        this.db = db;
-    }
+    private Database db = Database.getInstance();
 
     public Handler getUser = (req, res) -> {
         String username = req.get("username");
-        Document userDoc = null;
+        User user = null;
         try {
-            userDoc = this.db
-                    .col("users")
-                    .find(db.filter("username", username))
-                    .first();
+            user = new User().load(username);
+            if (user == null)
+                res.err("User '" + username + "' not found!", req);
+            else
+                res.setResponse(user.getAttributes());
         } catch (DBException exc) {
             res.err(exc, req);
-        }
-        if (userDoc == null) {
-            res.err("User '" + username + "' not found!", req);
-        } else {
-            res.setResponse(userDoc);
         }
     };
 
     public Handler createUser = (req, res) -> {
-        Document userDoc = req.data;
+        User user = new User().build(req.data);
         try {
-            this.db
-                    .col("users")
-                    .insertOne(userDoc);
+            if (!User.isUsernameAvailable(user.username)) {
+                res.err("Username '" + user.username + "' is not available.", req);
+                return;
+            }
+            if (user.validate()) {
+                user.save();
+                res.append("createdUser", "success");
+                res.end();
+            } else {
+                res.err("Invalid data params for creating a user", req);
+            }
         } catch (DBException exc) {
             res.err(exc);
         }
-        res.append("createdUser", "success");
-        res.end();
     };
 
     public Handler usernameIsAvailable = (req, res) -> {
@@ -63,9 +61,17 @@ public class Users {
         res.end();
     };
 
-    public void register() {
-
-    }
+    public Handler authenticate = (req, res) -> {
+        try {
+            User user = new User().load(req.get("username"));
+            if (user.authenticate(req.get("password")))
+                res.setResponse("Authentication successful");
+            else
+                res.setResponse("Incorrect password");
+        } catch (DBException exc) {
+            res.err(exc, req);
+        }
+    };
 
 }
 

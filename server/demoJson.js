@@ -2,13 +2,13 @@
 
 
    {
-      "route": "createUser",
+      "route": "authenticate",
       "data": {
-         "username": "rswanson",
-         "firstName": "Ron",
-         "lastName": "Swanson",
-         "email": "rswanny@man.com"
-
+         "username": "bshutt",
+         "password": "passwoxrd",
+         "firstName": "Brady",
+         "lastName": "Shutt",
+         "email": "bshutt@yo.com"
       }
    }
 
