@@ -1,29 +1,24 @@
 package bshutt.coplan.models;
 
-import bshutt.coplan.DBException;
 import bshutt.coplan.Database;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class User extends Model<User>{
+public class User extends Model<User> {
 
     private Database db = Database.getInstance();
 
-    public Document attributes;
     public String username;
-    public ObjectId userID;
-    public ArrayList<ObjectId> courses;
-    public boolean existsInDB;
 
     public User() {
-        this.courses = new ArrayList<ObjectId>();
         this.attributes = new Document();
         this.existsInDB = false;
     }
 
-    public User load(String username) throws DBException {
+    public User load(String username) throws Exception {
         Document userDoc = this.db
                 .col("users")
                 .find(this.db.filter("username", username))
@@ -33,25 +28,9 @@ public class User extends Model<User>{
         } else {
             this.attributes = userDoc;
             this.username = userDoc.getString("username");
-            this.userID = userDoc.get("_id", ObjectId.class);
             this.existsInDB = true;
             return this;
         }
-    }
-
-    public String get(String key) {
-        return this.attributes.getString(key);
-    }
-
-    public <T> T get(String key, Class<T> type) {
-        return this.attributes.get(key, type);
-    }
-
-    public void set(String key, Object value) {
-        if (this.attributes.containsKey(key))
-            this.attributes.replace(key, value);
-        else
-            this.attributes.append(key, value);
     }
 
     public User build(Document userDoc) {
@@ -60,11 +39,7 @@ public class User extends Model<User>{
         return this;
     }
 
-    public Document getAttributes() {
-        return this.attributes;
-    }
-
-    public void save() throws DBException {
+    public void save() throws Exception {
         if (this.existsInDB) {
             this.db.col("users").findOneAndReplace(
                     this.db.filter("username", this.username),
@@ -75,14 +50,14 @@ public class User extends Model<User>{
         }
     }
 
-    public boolean validate() throws DBException {
-        return ( this.attributes.containsKey("username")
+    public boolean validate() throws Exception {
+        return (this.attributes.containsKey("username")
                 && this.attributes.containsKey("firstName")
                 && this.attributes.containsKey("lastName")
-                && this.attributes.containsKey("password") );
+                && this.attributes.containsKey("password"));
     }
 
-    public boolean authenticate(String password) throws DBException {
+    public boolean authenticate(String password) throws Exception {
         User user = new User().load(username);
         return (user.get("password").equals(password));
     }
@@ -91,9 +66,40 @@ public class User extends Model<User>{
         try {
             User user = new User().load(username);
             return (user == null);
-        } catch (DBException e) {
+        } catch (Exception e) {
             return false;
         }
     }
 
+    public void registerForCourse(String courseName) throws Exception {
+        if (!Course.exists(courseName))
+            throw new Exception("The course '" + courseName + "' does not exist!");
+
+        ArrayList courses;
+        if (this.attributes.containsKey("courses")) {
+            courses = this.attributes.get("courses", ArrayList.class);
+        } else {
+            courses = new ArrayList();
+        }
+        courses.add(courseName);
+        this.attributes.put("courses", courses);
+        this.save();
+    }
+
+    public void unregisterForCourse(String courseName) throws Exception {
+        ArrayList courses =
+                (this.attributes.containsKey("courses"))
+                ? this.attributes.get("courses", ArrayList.class)
+                : new ArrayList();
+        if (!courses.contains(courseName)) {
+            throw new Exception("User '" + this.get("username")
+                    + "' is not registered for course '"
+                    + courseName + "'.");
+        } else {
+            courses.remove(courseName);
+            this.attributes.put("courses", courses);
+            this.save();
+        }
+    }
 }
+

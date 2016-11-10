@@ -1,8 +1,6 @@
 package bshutt.coplan.models;
 
-import bshutt.coplan.DBException;
 import bshutt.coplan.Database;
-import com.mongodb.MongoWriteException;
 import org.bson.Document;
 
 public abstract class Model<Type> {
@@ -32,8 +30,8 @@ public abstract class Model<Type> {
     }
 
     public abstract Type build(Document doc);
-    public abstract Type load(String filterVal) throws DBException;
-    public abstract void save() throws DBException;
-    public abstract boolean validate() throws DBException;
+    public abstract Type load(String filterVal) throws Exception;
+    public abstract void save() throws Exception;
+    public abstract boolean validate() throws Exception;
 
 }

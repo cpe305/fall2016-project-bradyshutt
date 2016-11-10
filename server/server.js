@@ -2,6 +2,7 @@
 
 const http = require('http')
 const fs = require('fs');
+
 const conf = require('./config.js')
 const express = require('express')
 const app = express()
@@ -21,7 +22,6 @@ let java = bridge()
 //   java.send(JSON.stringify(tests.getUser) + "\n")
 //})
 
-
 fs.watchFile('server/demoJson.js', {
    persistant: true,
    interval: 1000,
@@ -34,7 +34,7 @@ fs.watchFile('server/demoJson.js', {
       let req = JSON.stringify(reqJson)
       let pretty = JSON.stringify(reqJson, null, 4)
 
-      console.log('Requesting...\n'+pretty.blue + '\n')
+      console.log('Requesting...\n'+ pretty.blue + '\n')
       java.send(req)
    })
 })

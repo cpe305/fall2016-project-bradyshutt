@@ -28,6 +28,10 @@ public class Request {
         return this.data.get(key, type);
     }
 
+    public boolean contains(String key) {
+        return (this.data.containsKey(key));
+    }
+
     public Document pack() {
         Document p = new Document();
         p.append("route", this.route);

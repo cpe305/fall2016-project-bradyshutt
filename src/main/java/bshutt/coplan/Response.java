@@ -2,6 +2,9 @@ package bshutt.coplan;
 
 import org.bson.Document;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 public class Response {
 
     private String response;
@@ -32,6 +35,13 @@ public class Response {
         r.end();
     }
 
+    public static void log(Document doc) {
+        Response r = new Response();
+        r.append("type", TYPES.LOG);
+        r.append("msg", doc);
+        r.end();
+    }
+
     public Response setResponse(Document doc) {
         this.doc = new Document();
         this.doc.append("type", TYPES.GOOD);
@@ -52,7 +62,11 @@ public class Response {
         this.doc = new Document();
         this.doc.append("type", TYPES.ERR);
         this.doc.append("errMessage", exc.getMessage());
-        this.doc.append("stackTrace", exc.getStackTrace().toString());
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        exc.printStackTrace(pw);
+        String stackTrace = sw.toString();
+        this.doc.append("stackTrace", stackTrace);
         this.end();
         return this;
     }
@@ -71,6 +85,11 @@ public class Response {
         this.doc.append("type", TYPES.ERR);
         this.doc.append("msg", exc.getMessage());
         this.doc.append("req", req.pack());
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        exc.printStackTrace(pw);
+        String stackTrace = sw.toString();
+        this.doc.append("stackTrace", stackTrace);
         this.end();
         return this;
     }
@@ -85,5 +104,15 @@ public class Response {
         }
     }
 
+    public Response end(String msg) {
+        this.doc.append("message", msg);
+        if (this.isDone) {
+            throw new Error("This response has already finished. You can't end it again.");
+        } else {
+            System.out.println(doc.toJson());
+            this.isDone = true;
+            return this;
+        }
+    }
 
 }

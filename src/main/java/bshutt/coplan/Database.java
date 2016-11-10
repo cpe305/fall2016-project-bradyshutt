@@ -44,10 +44,10 @@ public class Database {
         return this;
     }
 
-    public MongoCollection<Document> col(String colName) throws DBException {
+    public MongoCollection<Document> col(String colName) throws Exception {
         MongoCollection<Document> collection = this.db.getCollection(colName);
         if (collection == null)
-            throw new DBException("Collection '" + colName + "' not found!");
+            throw new Exception("Collection '" + colName + "' not found!");
         else
             return collection;
     }

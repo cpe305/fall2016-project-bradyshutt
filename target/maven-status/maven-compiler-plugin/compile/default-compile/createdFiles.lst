@@ -7,8 +7,8 @@ bshutt/coplan/CliReaderStrategy.class
 bshutt/coplan/Database.class
 bshutt/coplan/Response$TYPES.class
 bshutt/coplan/Router.class
+bshutt/coplan/HandlerArgs.class
 bshutt/coplan/models/Model.class
-bshutt/coplan/DBException.class
 bshutt/coplan/Handler.class
 bshutt/coplan/JsonReaderStrategy.class
 bshutt/coplan/Callback.class
