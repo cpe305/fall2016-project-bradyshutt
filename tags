@@ -1,7 +1,7 @@
 !_TAG_FILE_SORTED	2	/0=unsorted, 1=sorted, 2=foldcase/
-check_args	/home/brady/school/cpe305/project/fall2016-project-bradyshutt/admin	/^check_args() {$/;"	f	language:Sh
-has_server_access	/home/brady/school/cpe305/project/fall2016-project-bradyshutt/admin	/^has_server_access() {$/;"	f	language:Sh
-main	/home/brady/school/cpe305/project/fall2016-project-bradyshutt/admin	/^main() {$/;"	f	language:Sh
-server_status	/home/brady/school/cpe305/project/fall2016-project-bradyshutt/admin	/^server_status() {$/;"	f	language:Sh
-start_server	/home/brady/school/cpe305/project/fall2016-project-bradyshutt/admin	/^start_server() {$/;"	f	language:Sh
-stop_server	/home/brady/school/cpe305/project/fall2016-project-bradyshutt/admin	/^stop_server() {$/;"	f	language:Sh
+check_args	/home/bshutt/school/cpe305/project/fall2016-project-bradyshutt/admin	/^check_args() {$/;"	f	language:Sh
+has_server_access	/home/bshutt/school/cpe305/project/fall2016-project-bradyshutt/admin	/^has_server_access() {$/;"	f	language:Sh
+main	/home/bshutt/school/cpe305/project/fall2016-project-bradyshutt/admin	/^main() {$/;"	f	language:Sh
+server_status	/home/bshutt/school/cpe305/project/fall2016-project-bradyshutt/admin	/^server_status() {$/;"	f	language:Sh
+start_server	/home/bshutt/school/cpe305/project/fall2016-project-bradyshutt/admin	/^start_server() {$/;"	f	language:Sh
+stop_server	/home/bshutt/school/cpe305/project/fall2016-project-bradyshutt/admin	/^stop_server() {$/;"	f	language:Sh

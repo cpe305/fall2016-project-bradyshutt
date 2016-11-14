@@ -7,6 +7,7 @@ import bshutt.coplan.models.Course;
 import bshutt.coplan.models.User;
 import com.mongodb.Block;
 import org.bson.Document;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.ArrayList;
 
@@ -22,25 +23,31 @@ public class Users {
             if (user == null)
                 res.err("User '" + username + "' not found!", req);
             else
-                res.setResponse(user.getAttributes());
+                res.setResponse(user.toDoc());
         } catch (Exception exc) {
             res.err(exc, req);
         }
     };
 
     public Handler createUser = (req, res) -> {
-        User user = new User().build(req.data);
-        if (!User.isUsernameAvailable(user.username)) {
-            res.err("Username '" + user.username + "' is not available.", req);
+        User user = new User().fromDoc(req.data);
+        if (!User.isUsernameAvailable(user.getUsername())) {
+            res.err("Username '" + user.getUsername() + "' is not available.", req);
             return;
         }
-        if (user.validate()) {
+        if (user.validate(user.toDoc())) {
             user.save();
             res.append("createdUser", "success");
             res.end();
         } else {
             res.err("Invalid data params for creating a user", req);
         }
+    };
+
+    public Handler removeUser = (req, res) -> {
+        String username = req.data.getString("username");
+        this.db.col("users").findOneAndDelete(this.db.filter("username", username));
+
     };
 
     public Handler usernameIsAvailable = (req, res) -> {
@@ -55,7 +62,7 @@ public class Users {
     };
 
     public Handler authenticate = (req, res) -> {
-        User user = new User().load(req.get("username"));
+        User user = req.getUser();
         if (user.authenticate(req.get("password")))
             res.setResponse("Authentication successful");
         else
@@ -63,23 +70,23 @@ public class Users {
     };
 
     public Handler registerForCourse = (req, res) -> {
-        User user = new User().load(req.get("username"));
+        User user = req.getUser();
         Course course = new Course().load(req.get("courseName"));
-        Response.log("cname: " + course.get("courseName"));
-        user.registerForCourse(course.get("courseName"));
-        course.registerUser(user.get("username"));
-        res.append("body", "User '" + user.get("username")
+        Response.log("cname: " + course.courseName);
+        user.registerForCourse(course.courseName);
+        course.registerUser(user.getUsername());
+        res.append("body", "User '" + user.getUsername()
                 + "' registered for courses + '"
                 + req.get("courseName") + "'.");
         res.end();
     };
 
     public Handler unregisterForCourse = (req, res) -> {
-        User user = new User().load(req.get("username"));
+        User user = req.getUser();
         Course course = new Course().load(req.get("courseName"));
         user.unregisterForCourse(req.get("courseName"));
         course.unregisterUser(req.get("username"));
-        res.append("body", "User '" + user.get("username")
+        res.append("body", "User '" + user.getUsername()
                 + "' unregistered for courses '"
                 + req.get("courseName") + "'.");
         res.end();

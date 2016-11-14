@@ -16,7 +16,8 @@ public class Driver {
         System.out.println(msg.toJson());
 
         Router router = Router.getInstance();
-        setupRoutes(router);
+        router.setupRoutes();
+        //setupRoutes(router);
 
         Reader reader = new Reader(new JsonReaderStrategy());
         try {
@@ -29,32 +30,32 @@ public class Driver {
 
     }
 
-    static void setupRoutes(Router router) {
-        Users users = new Users();
-        Courses courses = new Courses();
-
-        router.register("getUser", users.getUser, new String[] {"username"});
-
-        router.register("usernameIsAvailable", users.usernameIsAvailable, new String[] {"username"});
-
-        router.register("createUser", users.createUser, new String[] {"username", "firstName", "lastName"});
-
-        router.register("authenticate", users.authenticate, new String[] {"username", "password"});
-
-        router.register("registerForCourse", users.registerForCourse, new String[] {"username", "courseName"});
-
-        router.register("unregisterForCourse", users.unregisterForCourse, new String[] {"username", "courseName"});
-
-        router.register("getAllUsers", users.getAllUsers);
-
-        router.register("createCourse", courses.createCourse, new String[] {"courseName"});
-
-        router.register("getCourse", courses.getCourse, new String[] {"courseName"});
-
-        router.register("deleteCourse", courses.deleteCourse, new String[] {"courseName"});
-
-        router.register("getAllCourses", courses.getAllCourses);
-    }
+//    static void setupRoutes(Router router) {
+//        Users users = new Users();
+//        Courses courses = new Courses();
+//
+//        router.register("getUser", users.getUser, new String[] {"username"});
+//
+//        router.register("usernameIsAvailable", users.usernameIsAvailable, new String[] {"username"});
+//
+//        router.register("createUser", users.createUser, new String[] {"username", "firstName", "lastName"});
+//
+//        router.register("authenticate", users.authenticate, new String[] {"username", "password"});
+//
+//        router.register("registerForCourse", users.registerForCourse, new String[] {"username", "courseName"});
+//
+//        router.register("unregisterForCourse", users.unregisterForCourse, new String[] {"username", "courseName"});
+//
+//        router.register("getAllUsers", users.getAllUsers);
+//
+//        router.register("createCourse", courses.createCourse, new String[] {"courseName"});
+//
+//        router.register("getCourse", courses.getCourse, new String[] {"courseName"});
+//
+//        router.register("deleteCourse", courses.deleteCourse, new String[] {"courseName"});
+//
+//        router.register("getAllCourses", courses.getAllCourses);
+//    }
 
 
 }

@@ -107,6 +107,14 @@ server_status() {
 check_args() {
    if [ "$#" -lt 1 ]; then 
       echo "No arguments supplied"
+      echo "Valid arguments are:"
+      echo "  start"
+      echo "  stop"
+      echo "  start-local-server"
+      echo "  restart"
+      echo "  status"
+      echo "  startdb"
+      echo "  jar"
       exit
    else 
       CMD=$1    

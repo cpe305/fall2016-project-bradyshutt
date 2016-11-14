@@ -3,63 +3,97 @@ package bshutt.coplan.models;
 import bshutt.coplan.Database;
 import org.bson.Document;
 import org.bson.types.ObjectId;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class User extends Model<User> {
+    private static final String collectionName = "users";
+    private static final String filterKey = "username";
 
-    private Database db = Database.getInstance();
-
-    public String username;
+    private String username;
+    private ArrayList<String> courses;
+    private String firstName;
+    private String lastName;
+    private String email;
+    private String hashedPassword;
 
     public User() {
-        this.attributes = new Document();
-        this.existsInDB = false;
+        super(collectionName, filterKey);
     }
 
-    public User load(String username) throws Exception {
-        Document userDoc = this.db
-                .col("users")
-                .find(this.db.filter("username", username))
-                .first();
-        if (userDoc == null) {
-            return null;
+    public String getUsername() {
+        return this.username;
+    }
+
+    public String getFirstName() {
+        return this.firstName;
+    }
+
+    public String getLastName() {
+        return this.lastName;
+    }
+
+    public String getEmail() {
+        return this.email;
+    }
+
+    public String getHashedPassword() {
+        return this.hashedPassword;
+    }
+
+    public static User load(String username) throws Exception {
+        User user = new User();
+        Document rawDocument = user.loadModel(username);
+        if (user.fromDoc(rawDocument) != null) {
+            return user;
         } else {
-            this.attributes = userDoc;
-            this.username = userDoc.getString("username");
-            this.existsInDB = true;
-            return this;
+            return null;
         }
     }
 
-    public User build(Document userDoc) {
-        this.attributes.putAll(userDoc);
+    @Override
+    public User fromDoc(Document userDoc) throws Exception {
         this.username = userDoc.getString("username");
+        this.firstName = userDoc.getString("firstName");
+        this.lastName = userDoc.getString("lastName");
+        this.email = userDoc.getString("email");
+        this.courses = userDoc.get("courses", ArrayList.class);
+        if (this.courses == null)
+            this.courses = new ArrayList<String>();
+        if (userDoc.containsKey("hashedPassword")) {
+            this.hashedPassword = userDoc.getString("hashedPassword");
+        } else if (userDoc.containsKey("password")) {
+            String textPass = userDoc.getString("password");
+            this.hashedPassword = BCrypt.hashpw(textPass, BCrypt.gensalt(12));
+        } else {
+            this.hashedPassword = null;
+        }
         return this;
     }
 
-    public void save() throws Exception {
-        if (this.existsInDB) {
-            this.db.col("users").findOneAndReplace(
-                    this.db.filter("username", this.username),
-                    this.attributes);
-        } else {
-            this.db.col("users").insertOne(this.attributes);
-            this.existsInDB = true;
-        }
+    public boolean validate(Document doc) throws Exception {
+        return (doc.containsKey("username")
+                && doc.containsKey("firstName")
+                && doc.containsKey("lastName")
+                && doc.containsKey("courses")
+                && doc.containsKey("hashedPassword"));
     }
 
-    public boolean validate() throws Exception {
-        return (this.attributes.containsKey("username")
-                && this.attributes.containsKey("firstName")
-                && this.attributes.containsKey("lastName")
-                && this.attributes.containsKey("password"));
+    @Override
+    public Document toDoc() throws Exception {
+        Document doc = new Document("username", this.username)
+                .append("firstName", this.firstName)
+                .append("lastName", this.lastName)
+                .append("courses", this.courses)
+                .append("hashedPassword", this.hashedPassword)
+                .append("email", this.email);
+        return doc;
     }
 
     public boolean authenticate(String password) throws Exception {
-        User user = new User().load(username);
-        return (user.get("password").equals(password));
+        return BCrypt.checkpw(password, this.hashedPassword);
     }
 
     public static boolean isUsernameAvailable(String username) {
@@ -74,32 +108,29 @@ public class User extends Model<User> {
     public void registerForCourse(String courseName) throws Exception {
         if (!Course.exists(courseName))
             throw new Exception("The course '" + courseName + "' does not exist!");
-
-        ArrayList courses;
-        if (this.attributes.containsKey("courses")) {
-            courses = this.attributes.get("courses", ArrayList.class);
-        } else {
-            courses = new ArrayList();
-        }
-        courses.add(courseName);
-        this.attributes.put("courses", courses);
+        this.courses.add(courseName);
+        Course.load(courseName).registerUser(this.username);
+        this.hasUpdates = true;
         this.save();
     }
 
     public void unregisterForCourse(String courseName) throws Exception {
-        ArrayList courses =
-                (this.attributes.containsKey("courses"))
-                ? this.attributes.get("courses", ArrayList.class)
-                : new ArrayList();
-        if (!courses.contains(courseName)) {
-            throw new Exception("User '" + this.get("username")
-                    + "' is not registered for course '"
-                    + courseName + "'.");
-        } else {
-            courses.remove(courseName);
-            this.attributes.put("courses", courses);
-            this.save();
+        this.courses.remove(courseName);
+        this.hasUpdates = true;
+        this.save();
+    }
+
+    public ArrayList getCourses() {
+        return this.courses;
+    }
+
+    public String toString() {
+        try {
+            return "<"+this.username+"> "+ this.toDoc().toJson();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+        return null;
     }
 }
 

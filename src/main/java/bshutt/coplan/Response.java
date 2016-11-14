@@ -7,7 +7,6 @@ import java.io.StringWriter;
 
 public class Response {
 
-    private String response;
     private Document doc;
     public boolean isDone = false;
 
@@ -19,7 +18,7 @@ public class Response {
 
     public Response() {
         this.doc = new Document();
-        this.doc.append("status", TYPES.GOOD);
+        this.doc.append("type", TYPES.GOOD);
         this.doc.append("body", new Document());
     }
 
@@ -113,6 +112,10 @@ public class Response {
             this.isDone = true;
             return this;
         }
+    }
+
+    public Document getDoc() {
+        return this.doc;
     }
 
 }

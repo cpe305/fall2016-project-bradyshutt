@@ -15,16 +15,15 @@ public class Courses {
 
     public Handler getCourse = (req, res) -> {
         String courseName = req.get("courseName");
-        Course course = new Course().load(courseName);
+        Course course = Course.load(courseName);
         if (course != null) {
-            res.setResponse(course.getAttributes());
+            res.setResponse(course.toDoc());
         }
     };
 
     public Handler createCourse = (req, res) -> {
-        Course course = new Course().build(req.data);
-        course.attributes.putIfAbsent("registeredUsers", new ArrayList<String>());
-        if (course.validate()) {
+        Course course = new Course().fromDoc(req.data);
+        if (course.validate(course.toDoc())) {
             course.save();
             res.append("createdCourse", "success");
             res.end();

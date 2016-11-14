@@ -1,28 +1,19 @@
 package bshutt.coplan;
 
+import bshutt.coplan.handlers.Courses;
+import bshutt.coplan.handlers.Users;
 import org.bson.Document;
 
 import java.util.*;
 
 
-class HandlerArgs {
-    public Handler handler;
-    public ArrayList<String> args;
-
-    public HandlerArgs(Handler handler, ArrayList args) {
-        this.handler = handler;
-        this.args = args;
-    }
-}
-
-
 public class Router {
 
     private static Router instance = new Router();
-    private Map<String, HandlerArgs> routes;
+    private Map<String, HandlerWrapper> routes;
 
     private Router() {
-        this.routes = new HashMap<String, HandlerArgs>();
+        this.routes = new HashMap<String, HandlerWrapper>();
     }
 
     public static Router getInstance() {
@@ -30,21 +21,21 @@ public class Router {
     }
 
     public Router register(String key, Handler handler) {
-        HandlerArgs handlerArgs = new HandlerArgs(handler, null);
+        HandlerWrapper handlerArgs = new HandlerWrapper(handler, null);
         routes.put(key, handlerArgs);
         return this;
     }
 
     public Router register(String key, Handler handler, String[] args) {
         ArrayList<String> reqArgs = new ArrayList<String>(Arrays.asList(args));
-        HandlerArgs handlerArgs = new HandlerArgs(handler, reqArgs);
+        HandlerWrapper handlerArgs = new HandlerWrapper(handler, reqArgs);
         routes.put(key, handlerArgs);
         return this;
     }
 
-    public void route(Request req) {
+    public Response route(Request req) {
         Response res = new Response();
-        HandlerArgs handlerArgs = this.routes.get(req.route);
+        HandlerWrapper handlerArgs = this.routes.get(req.route);
         if (handlerArgs == null) {
             res.err("No handler found for route '" + req.route, req);
         } else {
@@ -61,30 +52,55 @@ public class Router {
             if (!res.isDone)
                 res.end();
         }
-
+        return res;
     }
 
+    public Handler getHandler(String handler) {
+        return this.routes.get(handler).handler;
+    }
+
+    public boolean routeExists(String route) {
+        return (this.routes.get(route) != null);
+    }
+
+    public void setupRoutes() {
+        Users users = new Users();
+        Courses courses = new Courses();
+
+        this.register("getUser", users.getUser, new String[] {"username"});
+
+        this.register("usernameIsAvailable", users.usernameIsAvailable, new String[] {"username"});
+
+        this.register("createUser", users.createUser, new String[] {"username", "firstName", "lastName", "password"});
+
+        this.register("removeUser", users.removeUser, new String[] {"username"});
+
+        this.register("authenticate", users.authenticate, new String[] {"username", "password"});
+
+        this.register("registerForCourse", users.registerForCourse, new String[] {"username", "courseName"});
+
+        this.register("unregisterForCourse", users.unregisterForCourse, new String[] {"username", "courseName"});
+
+        this.register("getAllUsers", users.getAllUsers);
+
+        this.register("createCourse", courses.createCourse, new String[] {"courseName"});
+
+        this.register("getCourse", courses.getCourse, new String[] {"courseName"});
+
+        this.register("deleteCourse", courses.deleteCourse, new String[] {"courseName"});
+
+        this.register("getAllCourses", courses.getAllCourses);
+    }
 
 }
 
+class HandlerWrapper {
+    public Handler handler;
+    public ArrayList<String> args;
 
-//    switch (subsystem) {
-//      case "user":
-//        System.out.println("Doing user action");
-//        break;
-//
-//      case "course":
-//        System.out.println("Doing course action");
-//        break;
-//
-//      case "admin":
-//        System.out.println("Doing administration action");
-//        break;
-//
-//      case "other":
-//        System.out.println("Doing something else action");
-//        break;
-//
-//      default:
-//        System.out.println("Unrecognized command...");
-//    }
+    public HandlerWrapper(Handler handler, ArrayList args) {
+        this.handler = handler;
+        this.args = args;
+    }
+}
+

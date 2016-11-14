@@ -1,5 +1,6 @@
 package bshutt.coplan;
 
+import bshutt.coplan.models.User;
 import org.bson.Document;
 
 import static org.bson.Document.parse;
@@ -8,6 +9,9 @@ public class Request {
 
     public String route;
     public Document data;
+    private User user;
+
+    public Request() { }
 
     public Request(String route, Document data) {
         this.route = route;
@@ -26,6 +30,16 @@ public class Request {
 
     public <T> T get(String key, Class<T> type) {
         return this.data.get(key, type);
+    }
+
+    public User getUser() throws Exception {
+        String username = this.get("username");
+        if (username == null) {
+            return null;
+        } else {
+            this.user = new User().load(username);
+            return this.user;
+        }
     }
 
     public boolean contains(String key) {

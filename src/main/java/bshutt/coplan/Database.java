@@ -27,12 +27,7 @@ public class Database {
         mongoLogger.setLevel(Level.SEVERE);
         this.client = new MongoClient(Database.url, Database.port);
         this.db = this.client.getDatabase(Database.dbName);
-        this.db.getCollection("users").createIndex(
-                new Document("username", 1),
-                new IndexOptions().unique(true));
-        this.db.getCollection("courses").createIndex(
-                new Document("courseName", 1),
-                new IndexOptions().unique(true));
+        this.setIndexes();
     }
 
     public static Database getInstance() {
@@ -41,7 +36,17 @@ public class Database {
 
     public Database changeDatabase(String dbName) {
         this.db = this.client.getDatabase(dbName);
+        this.setIndexes();
         return this;
+    }
+
+    public void setIndexes() {
+        this.db.getCollection("users").createIndex(
+                new Document("username", 1),
+                new IndexOptions().unique(true));
+        this.db.getCollection("courses").createIndex(
+                new Document("courseName", 1),
+                new IndexOptions().unique(true));
     }
 
     public MongoCollection<Document> col(String colName) throws Exception {
