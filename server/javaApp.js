@@ -13,12 +13,13 @@ let JavaApp = (onRecMsgFn) => {
          spawn('java', ['-jar', path.join(conf.base, 'target/', conf.jar)]))
 
       let isAlive = true
+      let callback
 
       javaApp.stdout.on('readable', () => {
          let data = javaApp.stdout.read()
-         onRecMsgFn
-            ? onRecMsgFn(data)
-            : console.log(data)
+         callback && callback(data)
+         onRecMsgFn && onRecMsgFn(data)
+         console.log(data)
       })
 
       javaApp.stderr.on('data', (data) => {
@@ -37,10 +38,11 @@ let JavaApp = (onRecMsgFn) => {
       })
 
       return {
-         send(msg) {
+         send(msg, cb) {
             javaApp.stdin.write(msg, 'utf8', (err) => {
                if (err) throw err
             })
+            callback = cb || null
             return javaApp
          },
 

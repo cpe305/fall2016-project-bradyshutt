@@ -1,0 +1,65 @@
+
+
+<!DOCTYPE HTML>
+<html lang="en">
+   <head>
+      <title>Coplan Demo</title> 
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width">
+
+      <link rel="stylesheet" href="css/demo.css">
+      <script src="js/jquery.js"></script>
+      <script src="js/demo.js"></script>
+
+   </head> 
+   <body> 
+
+      <header>
+         <h1>Coplan</h1>
+         <a href="http://coplan.bshutt.com"><h2>Home</h2></a>
+         <a href="file:///home/bshutt/school/cpe305/project/fall2016-project-bradyshutt/web/demo.html"><h2>Demo</h2></a>
+      </header>
+
+      <main role="main">
+
+      <div class="request-wrapper wrapper">
+         <h2>Json Request</h2>
+         <form>
+            <div class="json">
+            {<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"route" : "<input class="jsonInput" type="text" name="route" id="route">",<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"data" : {<br>
+            <p id="dataAttributes">
+            </p>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="images/plus.png" id="moreAttributes"><br>
+
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<br>
+            }
+            </div>
+            <input type="button" id="sendRequest" value="Send">
+         </form>
+      </div>
+
+      <div class="response-wrapper wrapper">
+         <h2>Json Response</h2>
+         <div class="json" id="responseDiv">
+
+         </div>
+      </div>
+
+      </main>
+
+</html>
+
+
+
+
+<!--
+   <span> {
+   <br>
+   &nbsp;&nbsp;&nbsp;&nbsp;
+   "route": </span>
+   <input type="text" name="route" id="route">
+   <br>
+   {</span>
+-->

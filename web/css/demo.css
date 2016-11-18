@@ -1,0 +1,86 @@
+
+
+* {
+   padding: 0px;
+   margin: 0px;
+   box-sizing: border-box;
+}
+
+body {
+   font-family: helvetica;
+}
+
+header {
+   background-color: #333;
+}
+
+header h1 {
+   color: #ccc;
+   padding: 10px;
+   display: inline-block;
+}
+
+header h2 {
+   color: #bbb;
+   display: inline-block;
+   padding: 10px;
+}
+
+
+main {
+   display: flex;
+   justify-content: center;
+   flex-direction: column;
+
+}
+
+.wrapper {
+   margin: 10px;
+   padding: 10px;
+}
+
+.request-wrapper {
+   display: block;
+}
+
+.response-wrapper {
+   display: block;
+}
+
+.json pre {
+   display: inline;
+}
+
+.json {
+   background-color: #444;
+   line-height: 30px;
+   color: #CDC;
+}
+
+.jsonInput {
+   background-color: transparent;
+   display: inline-block;
+   border: 0px solid;
+   border-bottom: 2px solid #CDC;
+   outline: none;
+   height: 20px;
+   max-width: 20%;
+   text-align: center;
+   color: #CDC;
+   -webkit-box-shadow: none;
+}
+
+.removeData {
+   top: 10px;
+   left: 10px;
+   margin: 5px;
+   position: relative;
+   width: 20px;
+}
+
+
+#moreAttributes {
+   width: 15px;
+   margin-top: 20px;
+}
+

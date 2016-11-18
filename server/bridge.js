@@ -13,18 +13,25 @@ let JavaApp = (onRecMsgFn) => {
          spawn('java', ['-jar', path.join(conf.base, 'target/', conf.jar)]))
 
       let isAlive = true
+      let callback
 
       javaApp.stdout.on('readable', () => {
          let data = javaApp.stdout.read().toString()
          let json
-         if (!(json = isJson(data))) return
+         console.log('java responded')
+         if (!(json = isJson(data))) {
+            console.log('oops')
+            return
+         }
          else {
-            if (onRecMsgFn)
-               onRecMsgFn(json)
-            else {
-               let pretty = JSON.stringify(json, null, 4); 
-               console.log("\nResponse:\n" + pretty.yellow + "\n")
+            console.log('woop')
+            if (callback) {
+               console.log('sending!')
+               callback(json)
             }
+            onRecMsgFn && onRecMsgFn(json)
+            let pretty = JSON.stringify(json, null, 4); 
+            console.log("\nResponse:\n" + pretty.yellow + "\n")
          }
       })
 
@@ -40,6 +47,8 @@ let JavaApp = (onRecMsgFn) => {
 
       javaApp.on('error', (err) => {
          console.log('JavaApp <error>:')
+         Error.captureStackTrace(err)
+         console.log(err.message)
          console.log(err)
       })
 
@@ -55,12 +64,13 @@ let JavaApp = (onRecMsgFn) => {
 
 
       return {
-         send(msg) {
+         send(msg, cb) {
             if (msg.split('\n').length === 1 || msg.split('\n')[1] === '')
                msg += '\n'
             javaApp.stdin.write(msg, 'utf8', (err) => {
                if (err) throw err
             })
+            callback = cb || null
             return javaApp
          },
 

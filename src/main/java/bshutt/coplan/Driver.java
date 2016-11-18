@@ -17,11 +17,11 @@ public class Driver {
 
         Router router = Router.getInstance();
         router.setupRoutes();
-        //setupRoutes(router);
 
-        Reader reader = new Reader(new JsonReaderStrategy());
+        Reader reader = new Reader(new JsonReaderStrategy()); // <--- Strategy Pattern
+                                                              // Listens for next input, builds a <Request> object
         try {
-            reader.listen(router::route);
+            reader.listen(router::route); // <--- Calls router.route(<Request>)
         } catch (Exception exc) {
             Response.log(new Document("exceptionMessage", exc.getMessage())
                     .append("stackTrace", exc.getStackTrace())
@@ -29,33 +29,4 @@ public class Driver {
         }
 
     }
-
-//    static void setupRoutes(Router router) {
-//        Users users = new Users();
-//        Courses courses = new Courses();
-//
-//        router.register("getUser", users.getUser, new String[] {"username"});
-//
-//        router.register("usernameIsAvailable", users.usernameIsAvailable, new String[] {"username"});
-//
-//        router.register("createUser", users.createUser, new String[] {"username", "firstName", "lastName"});
-//
-//        router.register("authenticate", users.authenticate, new String[] {"username", "password"});
-//
-//        router.register("registerForCourse", users.registerForCourse, new String[] {"username", "courseName"});
-//
-//        router.register("unregisterForCourse", users.unregisterForCourse, new String[] {"username", "courseName"});
-//
-//        router.register("getAllUsers", users.getAllUsers);
-//
-//        router.register("createCourse", courses.createCourse, new String[] {"courseName"});
-//
-//        router.register("getCourse", courses.getCourse, new String[] {"courseName"});
-//
-//        router.register("deleteCourse", courses.deleteCourse, new String[] {"courseName"});
-//
-//        router.register("getAllCourses", courses.getAllCourses);
-//    }
-
-
 }

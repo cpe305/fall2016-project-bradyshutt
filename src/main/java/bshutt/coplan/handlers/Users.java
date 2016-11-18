@@ -19,7 +19,7 @@ public class Users {
         String username = req.get("username");
         User user = null;
         try {
-            user = new User().load(username);
+            user = User.load(username);
             if (user == null)
                 res.err("User '" + username + "' not found!", req);
             else
@@ -71,7 +71,7 @@ public class Users {
 
     public Handler registerForCourse = (req, res) -> {
         User user = req.getUser();
-        Course course = new Course().load(req.get("courseName"));
+        Course course = Course.load(req.get("courseName"));
         Response.log("cname: " + course.courseName);
         user.registerForCourse(course.courseName);
         course.registerUser(user.getUsername());
@@ -83,7 +83,7 @@ public class Users {
 
     public Handler unregisterForCourse = (req, res) -> {
         User user = req.getUser();
-        Course course = new Course().load(req.get("courseName"));
+        Course course = Course.load(req.get("courseName"));
         user.unregisterForCourse(req.get("courseName"));
         course.unregisterUser(req.get("username"));
         res.append("body", "User '" + user.getUsername()

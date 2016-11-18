@@ -6,6 +6,7 @@ const fs = require('fs');
 const conf = require('./config.js')
 const express = require('express')
 const app = express()
+const bodyParser = require('body-parser')
 const bridge = require('./bridge.js')
 
 const tests = require('./tests.js')
@@ -13,6 +14,8 @@ const JavaApp = require('./javaApp.js')
 const colors = require('colors')
 
 let java = bridge()
+
+app.use(express.static('web'))
 
 //process.stdin.on('readable', () => {
 //   let msg = process.stdin.read()
@@ -22,22 +25,22 @@ let java = bridge()
 //   java.send(JSON.stringify(tests.getUser) + "\n")
 //})
 
-fs.watchFile('server/demoJson.js', {
-   persistant: true,
-   interval: 1000,
-}, (curr, prev) => {
-   fs.readFile('server/demoJson.js', (err, file) => {
-      let jsonStr = file
-         .toString('utf8')
-         .replace(/\s/g, '')
-      let reqJson = JSON.parse(jsonStr)
-      let req = JSON.stringify(reqJson)
-      let pretty = JSON.stringify(reqJson, null, 4)
-
-      console.log('Requesting...\n'+ pretty.blue + '\n')
-      java.send(req)
-   })
-})
+//fs.watchFile('server/demoJson.js', {
+//   persistant: true,
+//   interval: 1000,
+//}, (curr, prev) => {
+//   fs.readFile('server/demoJson.js', (err, file) => {
+//      let jsonStr = file
+//         .toString('utf8')
+//         .replace(/\s/g, '')
+//      let reqJson = JSON.parse(jsonStr)
+//      let req = JSON.stringify(reqJson)
+//      let pretty = JSON.stringify(reqJson, null, 4)
+//
+//      console.log('Requesting...\n'+ pretty.blue + '\n')
+//      java.send(req)
+//   })
+//})
 
 
 
@@ -65,7 +68,18 @@ app.get('/', (req, res) => {
    })
 })
 
-app.listen(8000)
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded())
+app.post('/endpoint', (req, res) => {
+   console.log('received endpoint req')
+   let jsonMsgStr = JSON.stringify(req.body)
+   java.send(jsonMsgStr, (javaResponse) => {
+      console.log('sending response to client')
+      res.end(JSON.stringify(javaResponse))
+   })
+})
+
+app.listen(8080)
 //app.listen(process.argv[2] || 80)
 
 

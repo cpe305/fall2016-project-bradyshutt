@@ -67,38 +67,30 @@ public class Router {
         Users users = new Users();
         Courses courses = new Courses();
 
-        this.register("getUser", users.getUser, new String[] {"username"});
+        this.register("getUser", users.getUser, new String[]{"username"});
 
-        this.register("usernameIsAvailable", users.usernameIsAvailable, new String[] {"username"});
+        this.register("usernameIsAvailable", users.usernameIsAvailable, new String[]{"username"});
 
-        this.register("createUser", users.createUser, new String[] {"username", "firstName", "lastName", "password"});
+        this.register("createUser", users.createUser, new String[]{"username", "firstName", "lastName", "password"});
 
-        this.register("removeUser", users.removeUser, new String[] {"username"});
-
-        this.register("authenticate", users.authenticate, new String[] {"username", "password"});
-
-        this.register("registerForCourse", users.registerForCourse, new String[] {"username", "courseName"});
-
-        this.register("unregisterForCourse", users.unregisterForCourse, new String[] {"username", "courseName"});
-
+        this.register("removeUser", users.removeUser, new String[]{"username"});
+        this.register("authenticate", users.authenticate, new String[]{"username", "password"});
+        this.register("registerForCourse", users.registerForCourse, new String[]{"username", "courseName"});
+        this.register("unregisterForCourse", users.unregisterForCourse, new String[]{"username", "courseName"});
         this.register("getAllUsers", users.getAllUsers);
-
-        this.register("createCourse", courses.createCourse, new String[] {"courseName"});
-
-        this.register("getCourse", courses.getCourse, new String[] {"courseName"});
-
-        this.register("deleteCourse", courses.deleteCourse, new String[] {"courseName"});
-
+        this.register("createCourse", courses.createCourse, new String[]{"courseName"});
+        this.register("getCourse", courses.getCourse, new String[]{"courseName"});
+        this.register("deleteCourse", courses.deleteCourse, new String[]{"courseName"});
         this.register("getAllCourses", courses.getAllCourses);
-    }
 
+    }
 }
 
 class HandlerWrapper {
     public Handler handler;
     public ArrayList<String> args;
 
-    public HandlerWrapper(Handler handler, ArrayList args) {
+    HandlerWrapper(Handler handler, ArrayList args) {
         this.handler = handler;
         this.args = args;
     }

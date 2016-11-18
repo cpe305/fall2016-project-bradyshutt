@@ -98,10 +98,10 @@ public class User extends Model<User> {
 
     public static boolean isUsernameAvailable(String username) {
         try {
-            User user = new User().load(username);
+            User user = User.load(username);
             return (user == null);
         } catch (Exception e) {
-            return false;
+            return true;
         }
     }
 
