@@ -1,40 +1,25 @@
-<!DOCTYPE HTML>
-<html lang="en">
-<head>
-   <title>CoPlan | College Planner</title> 
-   <meta charset="utf-8">
-   <meta name="viewport" content="width=device-width">
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Angular QuickStart</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="styles.css">
 
-   <style>
-      a { color: inherit; text-decoration: none;}
-      a:hover { 
-         text-shadow: 1px 1px .2px #aaa, -1px 1px .2px #aaa, 1px -1px .2px #aaa, -1px -1px .2px #aaa;
-      }
-   </style>
+    <!-- Polyfill(s) for older browsers -->
+    <script src="node_modules/core-js/client/shim.min.js"></script>
 
-</head> 
-<body style="background-color: #333; text-align: center; font-family: helvetica; color: #bbb"> 
-   <div>
-      <h1>Welcome to CoPlan.</h1>
-      <h3>The College Planner.</h3>
-   </div>
-   <div>
-      <div style="display: flex; justify-content: center;">
-         <p style="padding: 8px 20px;">
-            Master<br><img src="https://travis-ci.org/cpe305/fall2016-project-bradyshutt.svg?branch=master">
-         </p>
-         <p style="padding: 8px 20px;">
-            Development<br><img src="https://travis-ci.org/cpe305/fall2016-project-bradyshutt.svg?branch=development">
-         </p>
-      </div>
-   </div>
+    <script src="node_modules/zone.js/dist/zone.js"></script>
+    <script src="node_modules/reflect-metadata/Reflect.js"></script>
+    <script src="node_modules/systemjs/dist/system.src.js"></script>
 
+    <script src="systemjs.config.js"></script>
+    <script>
+      System.import('app').catch(function(err){ console.error(err); });
+    </script>
+  </head>
 
-   <div style="position: fixed; bottom: 0; width: 100%; padding-bottom: 10px;">
-      Created by <a href="http://bshutt.com/">Brady Shutt</a><br>
-      <a href="http://github.com/bradyshutt/">Github</a>
-   </div>
-
-
-</body> 
+  <body>
+    <main-app>Loading AppComponent content here ...</main-app>
+  </body>
 </html>

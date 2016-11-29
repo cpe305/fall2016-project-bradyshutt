@@ -1,0 +1,16 @@
+
+.sideBar {
+  background-color: red;
+  display: block;
+  width: 15%;
+  height: 100%;
+  float: left;
+  padding-bottom: 9999px;
+  margin-bottom: -9999px;
+  overflow: hidden;
+}
+
+
+
+
+

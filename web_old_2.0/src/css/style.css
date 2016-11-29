@@ -1,0 +1,116 @@
+
+/*
+ * Colors:
+ *    Tangerine: #E37222
+ *    Teal:      #07889B
+ *    Powder:    #66B9BF
+ *    Tan:       #EEAA7B
+ *    Dark:      #343434
+ *    Grayish    #E1E3E4
+ * 
+ * */
+
+html, body {
+   height: 100%;
+}
+
+header {
+   display: block;
+   background-color: #07889B;
+   background-color: #d7d7d7;
+   background-color: #343434;
+   
+   width: 100%;
+   height: 7%;
+}
+
+.title {
+   font-size: 3.4em;
+   color: #d7d7d7;
+   color: #EEAA7B;
+   color: #E37222;
+   letter-spacing: 4px;
+   line-height: 1.4em;;
+   padding: 0 0 0 20px;
+   margin: 0px;
+   text-shadow: 2px 2px 3px #000;
+   font-weight: 900;
+}
+
+.col-nopad { padding: 0px; }
+
+.main {
+   height: 93%;
+   background-color: orange;
+}
+.main-row {
+   height: 100%;
+}
+
+.left-panel {
+   padding: 10px;
+   margin: 0px;
+   height: 100%;
+   background-color: #66B9BF;
+   background-color: #66B9BF;
+}
+
+.editing {
+}
+
+.editing .name {
+   display: none;
+}
+.edit {
+   display: none;
+}
+.editing .edit {
+   display: initial;
+   border: 0px;
+   border-bottom: inherit;
+   padding: 2px;
+}
+
+.editing .edit:focus {
+   border: 0px;
+   outline: 0px;
+   border-bottom: inherit;
+}
+
+.right-panel {
+   background-color: #AACCff;
+   background-color: #d7d7d7;
+   background-color: #E1E3E4;
+   height: 100%;
+}
+
+#new-pin-button {
+   margin: 10px 40px 0 10px;
+}
+
+.pin {
+   display: inline-block;
+   margin: 10px;
+   float: left;
+   border: 1px solid #E37222;
+}
+
+.pin-title {
+   padding: 0px;
+   margin: 0px;
+}
+
+.pin-body h3 {
+   padding: 0px;
+   margin: 0px;
+}
+
+.filter {
+   margin: 10px 5px 5px 5px;
+}
+.filter input {
+   padding 2px;
+}
+
+
+
