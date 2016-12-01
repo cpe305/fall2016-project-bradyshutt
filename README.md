@@ -6,11 +6,33 @@ Brady Shutt's project for CPE-305
 [![Build Status](https://travis-ci.org/cpe305/fall2016-project-bradyshutt.svg?branch=master)](https://travis-ci.org/cpe305/fall2016-project-bradyshutt)
 
 
+# Coplan
 
+_The College Planner_
+
+> Manage important due dates, deadlines, and test days with Coplan!
+
+## Project Structure
+The way in which this project behaves is a little strange, 
+so some explanation is necesarry.
+
+The core business logic of this project is written in Java. 
+The application works by letting the JVM endlessly run the 
+exported .jar file. The .jar then, indefinitely listens to 
+it's STDIN in a blocking fashion. Upon receiving input, which
+must be preformmated JSON, the running Java application will 
+handle the 'request', and eventually return a response by 
+writing a JSON message to STDOUT.
+
+A Node.js application is also running. Node.js acts as the
+HTTP server that clients interract with. Upon receiving a 
+HTTP request, node will, if necesarry, talk to the running 
+JVM via STDIN/STDOUT to fulfill requests.
+
+The Node.js process is essentially acting as the bridge
+between the client and the business logic.
 
 # Commands
-
-
 
 The Java program will handle all business logic associated with CoPlan.
 
