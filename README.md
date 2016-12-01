@@ -56,6 +56,8 @@ Commands are to be formatted in the following way:
 
 
 ## Class Diagram
-
 ![Class Diagram](/coplanDiagram.png)
+
+## Picture of Application 
+![Application Picture](/currentState.png)
 
