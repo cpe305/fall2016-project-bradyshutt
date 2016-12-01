@@ -71,17 +71,6 @@ Example format of requests:
 The Java process should be able to handle the 
 following JSON formatted requests appropriately: 
 
-
-|--------+-----------------+----------------------------+------------------------|
-| Subsys | Action          | Data                       | Returns                |
-|--------+-----------------+----------------------------+------------------------|
-| Users  | get             | how many & offset          | flat list of usernames |
-| Users  | isNameAvailable | username to check          |                        |
-| User   | create          | new users details          |                        |
-| User   | delete          | username of user to delete |                        |
-| User   | get             | username, attributes       | user details           |
-|--------+-----------------+----------------------------+------------------------|
-
       
 -------------------------------------------------------------
 
