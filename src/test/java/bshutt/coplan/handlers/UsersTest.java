@@ -30,8 +30,9 @@ public class UsersTest {
                 .setRoute("getUser")
                 .addData("username", usernameToGet)
                 .end();
-        Document response = router.route(req).getDoc();
-        Document body = response.get("body", Document.class);
+        Response response = router.route(req);
+        Document doc = response.getDoc();
+        Document body = doc.get("body", Document.class);
 
         assertEquals("bshutt", body.get("username"));
         assertEquals("Brady", body.get("firstName"));

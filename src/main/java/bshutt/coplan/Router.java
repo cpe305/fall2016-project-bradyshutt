@@ -42,6 +42,7 @@ public class Router {
             if (handlerArgs.args == null || req.data.keySet().containsAll(handlerArgs.args)) {
                 try {
                     handlerArgs.handler.handle(req, res);
+                    System.out.println(res);
                 } catch (Exception exc) {
                     res.err(exc);
                 }
