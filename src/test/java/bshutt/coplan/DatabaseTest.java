@@ -18,6 +18,14 @@ public class DatabaseTest extends TestCase {
   }
 
   @Test
+  public void testDBRunning() throws Exception {
+    Database db = Database.getInstance();
+    assertNotNull(db);
+    assertNotNull(db.client);
+    assertNotNull(db.db);
+  }
+
+  @Test
   public void testDocInsertionDeletion1() throws Exception {
 
   }
