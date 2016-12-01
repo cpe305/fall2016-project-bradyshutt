@@ -24,54 +24,84 @@ public class UsersTest {
     }
 
     @Test
-    public void testGetUser() {
-        String usernameToGet = "bshutt";
-        Request req = new RequestBuilder()
+    public void testCreateThenGetUser() {
+
+        Request createReq = new RequestBuilder()
+                .setRoute("createUser")
+                .addData("username", "_test_bshutt")
+                .addData("firstName", "BradyTest")
+                .addData("lastName", "ShuttTest")
+                .addData("password", "testpassword")
+                .end();
+        Document createResponse = router.route(createReq).getDoc();
+        assertNotNull(createResponse);
+
+        String usernameToGet = "_test_bshutt";
+        Request getReq = new RequestBuilder()
                 .setRoute("getUser")
                 .addData("username", usernameToGet)
                 .end();
-        Response response = router.route(req);
-        Document doc = response.getDoc();
+        Response getResponse = router.route(getReq);
+        Document doc = getResponse.getDoc();
         Document body = doc.get("body", Document.class);
 
-        assertEquals("bshutt", body.get("username"));
-        assertEquals("Brady", body.get("firstName"));
-        assertEquals("Shutt", body.get("lastName"));
+        assertEquals("_test_bshutt", body.get("username"));
+        assertEquals("BradyTest", body.get("firstName"));
+        assertEquals("ShuttTest", body.get("lastName"));
 
+        Request deleteReq = new RequestBuilder()
+                .setRoute("removeUser")
+                .addData("username", "_test_bshutt")
+                .end();
+        Document deleteRes = router.route(deleteReq).getDoc();
+        assertEquals("response", deleteRes.get("type"));
     }
 
     @Test
     public void testCreateUser() {
         Request req = new RequestBuilder()
                 .setRoute("createUser")
-                .addData("username", "xx_test_user")
+                .addData("username", "_test_user")
                 .addData("firstName", "Test")
                 .addData("lastName", "User")
                 .addData("password", "password123")
                 .end();
         Document response = router.route(req).getDoc();
-        //assertEquals("response", response.get("type"));
+        assertEquals("response", response.get("type"));
 
         Request deleteReq = new RequestBuilder()
                 .setRoute("removeUser")
-                .addData("username", "xx_test_user")
+                .addData("username", "_test_user")
                 .end();
         Document deleteResponse = router.route(deleteReq).getDoc();
-        //assertEquals("response", deleteResponse.get("type"));
+        assertEquals("response", deleteResponse.get("type"));
     }
 
 
     @Test
     public void testCreateUserFailure() {
-        Request req = new RequestBuilder()
+        RequestBuilder reqTemplate = new RequestBuilder()
                 .setRoute("createUser")
-                .addData("username", "bshutt")
+                .addData("username", "_test_bshutt")
                 .addData("firstName", "Brady")
                 .addData("lastName", "Shutt")
-                .end();
-        Document response = router.route(req).getDoc();
+                .addData("password", "123");
 
-        assertEquals("error", response.get("type"));
+        Request req1 = reqTemplate.end();
+        Document response1 = router.route(req1).getDoc();
+        assertEquals("response", response1.get("type"));
+
+        Request req2 = reqTemplate.end();
+        Document response2 = router.route(req2).getDoc();
+        assertEquals("error", response2.get("type"));
+
+        Request deleteReq = new RequestBuilder()
+                .setRoute("removeUser")
+                .addData("username", "_test_bshutt")
+                .end();
+        Document deleteResponse = router.route(deleteReq).getDoc();
+        assertEquals("response", deleteResponse.get("type"));
+
     }
 
 }
