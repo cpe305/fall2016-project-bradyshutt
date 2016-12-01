@@ -49,10 +49,10 @@ public class Database {
                 new IndexOptions().unique(true));
     }
 
-    public MongoCollection<Document> col(String colName) throws Exception {
+    public MongoCollection<Document> col(String colName) throws DbException {
         MongoCollection<Document> collection = this.db.getCollection(colName);
         if (collection == null)
-            throw new Exception("Collection '" + colName + "' not found!");
+            throw new DbException("Collection '" + colName + "' not found!");
         else
             return collection;
     }
@@ -61,6 +61,11 @@ public class Database {
         return Filters.eq(key, val);
     }
 
+    public class DbException extends Exception {
+        public DbException(String msg) {
+            super(msg);
+        }
+    }
 
 }
 

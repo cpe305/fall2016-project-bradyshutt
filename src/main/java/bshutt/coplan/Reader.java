@@ -8,6 +8,7 @@ public class Reader {
     private InputStreamReader isr;
     private BufferedReader bufferReader;
     private ReaderStrategy readerStrategy;
+    private boolean continueReading = true;
 
     public Reader(ReaderStrategy readerStrategy) {
         this.readerStrategy = readerStrategy;
@@ -18,7 +19,8 @@ public class Reader {
 
     void listen(Callback cb) {
         String nextInput;
-        while (true) {
+        this.continueReading = true;
+        while (continueReading) {
             try {
                 if ((nextInput = bufferReader.readLine()) != null) {
                     Request req = this.readerStrategy.interpret(nextInput);
@@ -29,6 +31,10 @@ public class Reader {
                 //exception.printStackTrace();
             }
         }
+    }
+
+    void stopReading() {
+        this.continueReading = false;
     }
 
 }

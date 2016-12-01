@@ -8,11 +8,10 @@ import java.util.ArrayList;
 
 public class CliReaderStrategy implements ReaderStrategy {
 
-
     @Override
     public Request interpret(String cmdString) {
         String[] cmdArray = cmdString.split(" ");
-        Document data = null;
+        Document data;
 
         if (cmdArray.length == 1) {
             data = null;
