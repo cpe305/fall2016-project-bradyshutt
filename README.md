@@ -1,16 +1,15 @@
 Brady Shutt's project for CPE-305
 
 
+# Coplan
+
 [coplan.bshutt.com](http://coplan.bshutt.com/)
 
 [![Build Status](https://travis-ci.org/cpe305/fall2016-project-bradyshutt.svg?branch=master)](https://travis-ci.org/cpe305/fall2016-project-bradyshutt)
 
+_Coplan: The College Planner_
 
-# Coplan
-
-_The College Planner_
-
-> Manage important due dates, deadlines, and test days with Coplan!
+Manage important due dates, deadlines, and test days with Coplan!
 
 ## Project Structure
 The way in which this project behaves is a little strange, 
@@ -32,33 +31,21 @@ JVM via STDIN/STDOUT to fulfill requests.
 The Node.js process is essentially acting as the bridge
 between the client and the business logic.
 
-# Commands
+## Commands
 
-The Java program will handle all business logic associated with CoPlan.
+The Java program handles all the business logic associated with
+Coplan, by communicating with a Node.js process via JSON-formatted
+commands sent through STDIN/STDOUT.
 
-This will be accomplished by running a Node.js webserver that 
-spawns the Java program as a child process. The two programs 
-will communicate with each other through STDIO. Whenever Node
-needs business logic accomplished, it will create a "request"
-object as a JSON-formatted string with the details needed for
-the request to be fulfilled, and then send this request string 
-to the Java child process through its STDIN.  
-
-The Java program will be continuously reading its STDIN in a 
-blocking fashion until it reads a full JSON string. At that 
-point, the Java program will fulfill the request, and finally
-respond to Node by simply printing out a response as a 
-JSON-formatted string.
-
-Node will be listening for that, and finally response to the 
-original HTTP request. 
-
--------------------------------------------------------------
-
-Example format of requests:
+Commands are to be formatted in the following way:
+   - There are two essentail components: 'route', and 'data'
+   - 'route' specifies the endpoint you want to talk you
+   - 'data' specifies an object with keys and values pertinant to the endpoint
+   - If you attempt to access an endpoint without the needed requirements, an error message will be returned
+ 
+## Request Example 
 { 
-   subsystem: "users", 
-   action: "create", 
+   route: "createUser", 
    data: {
       username: "bshutt",
       firstName: "Brady",
@@ -68,46 +55,7 @@ Example format of requests:
 }
 
 
-The Java process should be able to handle the 
-following JSON formatted requests appropriately: 
+## Class Diagram
 
-      
--------------------------------------------------------------
-
-Users.readUsers <query, count>
-
-Users.createUser <user-info>
-Users.readUser <filter>
-Users.updateUser <filter, info>
-Users.deleteUser <filter>
-Users.isUsernameAvailable <username>
-
-Courses.readCourses <query, count>
-
-Courses.createCourse <course-info>
-Courses.readCourse <course-info>
-Courses.updateCourse <filter, info>
-Courses.deleteCourse <filter>
-
-
-example: createUser
-{ 
-   route: 'Users.createUser',
-   data: {
-      username: 'bshutt',
-      firstName: 'Brady',
-      lastName: 'Shutt',
-      age: 21
-   }
-}
-
-
-example: readUser
-{ 
-   route: 'Users.readUser',
-   data: {
-      username: 'bshutt'
-   }
-}
-
+![Class Diagram](/coplanDiagram.png)
 
