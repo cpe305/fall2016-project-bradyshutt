@@ -37,9 +37,20 @@ public class Request {
         if (username == null) {
             return null;
         } else {
-            this.user = new User().load(username);
+            this.user = User.load(username);
             return this.user;
         }
+    }
+
+    public User getUserFromJwt() throws Exception {
+        String jwt = this.get("jwt");
+        if (jwt == null) {
+            return null;
+        } else {
+            this.user = User.loadFromJwt(jwt);
+            return this.user;
+        }
+
     }
 
     public boolean contains(String key) {

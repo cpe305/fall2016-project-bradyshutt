@@ -10,7 +10,6 @@ const bodyParser = require('body-parser')
 const bridge = require('./bridge.js')
 
 const tests = require('./tests.js')
-const JavaApp = require('./javaApp.js')
 const colors = require('colors')
 
 let java = bridge()

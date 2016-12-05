@@ -1,13 +1,111 @@
 'use strict';
 
-import {Component, Injectable} from '@angular/core';
+import { Component, Injectable, OnInit } from '@angular/core';
+
+import { UserService } from './services/user.service' ;
+import { User } from './user';
+import { Course } from './course';
+
 
 @Component({
   selector: 'side-bar',
-  templateUrl: 'app/side-bar.component.html',
-  styleUrls: ['app/side-bar.component.css']
+  moduleId: module.id,
+  template: `
+    <div class="sideBar">
+      <div class="heading">
+        <h2>My Courses</h2>
+        <button (click)="addCourseInit()">Add Course</button>
+      </div>
+      <div class="content">
+        <div class="addCourseWrapper" *ngIf="addingCourses">
+          <h3>Add a new course:</h3>
+          <label>College: &nbsp;</label><input [(ngModel)]="model.college" maxlength="4" placeholder="CSC"><br>
+          <label>Number: </label><input [(ngModel)]="model.number" type="number" maxlength="4" placeholder="123"><br>
+          <button (click)="addCourseSubmit()">Add Course</button>
+          <button (click)="addCourseCancel()">Cancel</button>
+        </div>
+        <ul>
+          <li *ngFor="let course of courses">
+            {{course.name}}
+          </li>
+        </ul>
+      </div>
+    </div>
+  `,
+  styles: [`
+    .sideBar {
+      background-color: red;
+      display: block;
+      width: 15%;
+      height: 100%;
+      float: left;
+      padding-bottom: 9999px;
+      margin-bottom: -9999px;
+      overflow: hidden;
+    }
+    .heading {
+      background-color: orange;
+      padding: 15px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .heading button {
+      padding: 4px;
+    }
+    ul {
+      list-style-type: none;
+    }
+    li:first-child {
+      border-top: 2px solid black;
+    }
+    li {
+      display: block;
+      background-color: pink;
+      padding: 10px;
+      border-bottom: 2px solid black;
+    }
+    .addCourseWrapper {
+      padding: 15px;
+      background-color: white;
+    }
+    
+  `]
 })
 
-export class SideBar {
+export class SideBar implements OnInit {
+  model: any = {};
+  private user: User;
+  private addingCourses: boolean = false;
+  private courses: Course[];
+
+  constructor(private userService: UserService) {}
+
+  ngOnInit(): void {
+    this.user = this.userService.currentUser();
+    //this.courses = this.user.courses;
+    this.courses = [
+      {id: 1, name: 'CPE-305', pins: ['pin1', 'pin2', 'pin3'] },
+      {id: 2, name: 'CSC-445', pins: ['pin4', 'pin5', 'pin6'] }
+    ]
+  }
+
+  addCourseInit() {
+    this.addingCourses = true;
+  }
+
+  addCourseCancel() {
+    this.addingCourses = false;
+  }
+
+  addCourseSubmit() {
+    let collegeName: String = this.model.college;
+    let courseNumber: Number = this.model.number;
+    let course:String = collegeName.toUpperCase() + '-' + courseNumber;
+
+    console.log('course about to add: ', course);
+
+    this.userService.addCourse(course);
+    this.addingCourses = false;
+  }
 
 }

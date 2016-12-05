@@ -1,22 +1,30 @@
 package bshutt.coplan.models;
 
 import bshutt.coplan.Database;
+import com.auth0.jwt.JWTSigner;
+import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.JWTVerifyException;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class User extends Model<User> {
     private static final String collectionName = "users";
     private static final String filterKey = "username";
+    private static final String SECRET_KEY= "123j3kkk89dfd73kk7zh";
+    private static final String ISSUER = "http://coplan.bshutt.com/";
 
     private String username;
     private ArrayList<String> courses;
     private String firstName;
     private String lastName;
     private String email;
+    private String jwt;
     private String hashedPassword;
 
     public User() {
@@ -26,21 +34,20 @@ public class User extends Model<User> {
     public String getUsername() {
         return this.username;
     }
-
     public String getFirstName() {
         return this.firstName;
     }
-
     public String getLastName() {
         return this.lastName;
     }
-
     public String getEmail() {
         return this.email;
     }
-
     public String getHashedPassword() {
         return this.hashedPassword;
+    }
+    public String getJwt() {
+        return this.jwt;
     }
 
     public static User load(String username) throws Exception {
@@ -94,6 +101,46 @@ public class User extends Model<User> {
 
     public boolean authenticate(String password) throws Exception {
         return BCrypt.checkpw(password, this.hashedPassword);
+    }
+
+    public String giveJwt() throws Exception {
+        final long iat = System.currentTimeMillis() / 1000L;
+        final long exp = iat + (24L*60L*60L);
+        final JWTSigner signer = new JWTSigner(User.SECRET_KEY);
+        final HashMap<String, Object> claims = new HashMap<String, Object>();
+        claims.put("iss", User.ISSUER);
+        claims.put("exp", exp);
+        claims.put("iat", iat);
+        claims.put("username", this.username);
+        final String jwt  = signer.sign(claims);
+        this.jwt = jwt;
+        this.save();
+        return jwt;
+    }
+
+    public static boolean validateJwt(String jwt) throws Exception {
+        try {
+            final JWTVerifier verifier = new JWTVerifier(User.SECRET_KEY);
+            final Map<String, Object> claims = verifier.verify(jwt);
+            String username = (String) claims.get("username");
+            return username != null;
+        } catch (JWTVerifyException exc) {
+            return false;
+        }
+    }
+
+    public static User loadFromJwt(String jwt) {
+        try {
+            final JWTVerifier verifier = new JWTVerifier(User.SECRET_KEY);
+            final Map<String, Object> claims = verifier.verify(jwt);
+            String username = (String) claims.get("username");
+            if (username != null)
+                return User.load(username);
+            else
+                return null;
+        } catch (Exception exc) {
+            return null;
+        }
     }
 
     public static boolean isUsernameAvailable(String username) {

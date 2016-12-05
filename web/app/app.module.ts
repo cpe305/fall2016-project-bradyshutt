@@ -1,22 +1,55 @@
 import { NgModule }      from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { FormsModule } from '@angular/forms';
+
+import { RouterModule } from '@angular/router';
 
 import { AppComponent }  from './app.component';
-import { SideBar } from './side-bar.component';
+import { Dashboard } from './dashboard.component';
 import { MainContent } from './main-content.component';
-import {UserService} from "./user.service";
+import { SideBar } from './side-bar.component';
+import { UserService } from './services/user.service';
+import { CurrentUser } from './current-user.component';
+import { LoginComponent } from './login.component';
+import { AuthenticationService } from './services/authentication.service';
+import { HttpModule } from '@angular/http';
+import { MessagingService } from  './services/messaging.service';
 
 
 @NgModule({
-  imports:      [ BrowserModule ],
+  imports: [
+    BrowserModule,
+    FormsModule,
+    HttpModule,
+    RouterModule.forRoot([
+      {
+        path: 'dashboard',
+        component: Dashboard
+      },
+      {
+        path: 'whoami',
+        component: CurrentUser
+      },
+      {
+        path: 'login',
+        component: LoginComponent
+      }
+    ])
+  ],
   declarations: [
     AppComponent,
     SideBar,
-    MainContent
+    MainContent,
+    Dashboard,
+    CurrentUser,
+    LoginComponent
   ],
   providers: [
-    UserService
+    UserService,
+    AuthenticationService,
+    MessagingService
   ],
-  bootstrap:    [ AppComponent ]
+  bootstrap: [ AppComponent ]
 })
+
 export class AppModule { }

@@ -17,8 +17,13 @@ public class Courses {
         String courseName = req.get("courseName");
         Course course = Course.load(courseName);
         if (course != null) {
-            res.setResponse(course.toDoc());
+            res.append("course", course.toDoc());
+            res.end(true);
         }
+        else {
+            res.end(false);
+        }
+
     };
 
     public Handler createCourse = (req, res) -> {
@@ -26,7 +31,7 @@ public class Courses {
         if (course.validate(course.toDoc())) {
             course.save();
             res.append("createdCourse", "success");
-            res.end();
+            res.end(true);
         } else {
             res.err("invalid params for creating new course", req);
         }
@@ -35,7 +40,7 @@ public class Courses {
     public Handler deleteCourse = (req, res) -> {
         String courseName = req.get("courseName");
         this.db.col("courses").findOneAndDelete(this.db.filter("courseName", courseName));
-        res.end("Course deleted");
+        res.end(true, "Course deleted");
     };
 
     public Handler getAllCourses = (req, res) -> {

@@ -22,8 +22,10 @@ public class Users {
             user = User.load(username);
             if (user == null)
                 res.err("User '" + username + "' not found!", req);
-            else
-                res.setResponse(user.toDoc());
+            else {
+                res.append("user", user.toDoc());
+                res.end(true);
+            }
         } catch (Exception exc) {
             res.err(exc, req);
         }
@@ -38,7 +40,7 @@ public class Users {
         if (user.validate(user.toDoc())) {
             user.save();
             res.append("createdUser", "success");
-            res.end();
+            res.end(true);
         } else {
             res.err("Invalid data params for creating a user", req);
         }
@@ -47,7 +49,7 @@ public class Users {
     public Handler removeUser = (req, res) -> {
         String username = req.data.getString("username");
         this.db.col("users").findOneAndDelete(this.db.filter("username", username));
-
+        res.end(true);
     };
 
     public Handler usernameIsAvailable = (req, res) -> {
@@ -61,12 +63,25 @@ public class Users {
         res.end();
     };
 
-    public Handler authenticate = (req, res) -> {
-        User user = req.getUser();
-        if (user.authenticate(req.get("password")))
-            res.setResponse("Authentication successful");
+    public Handler checkJwt = (req, res) -> {
+        String jwt = req.get("jwt");
+        Boolean validated = User.validateJwt(jwt);
+        if (validated)
+            res.end(true);
         else
-            res.setResponse("Incorrect password");
+            res.end(false);
+    };
+
+    public Handler login = (req, res) -> {
+        User user = req.getUser();
+        if (user.authenticate(req.get("password"))) {
+            String jwt = user.giveJwt();
+            res.append("jwt", jwt);
+            res.append("user", user.toDoc());
+            res.end(true);
+        }
+        else
+            res.end(false);
     };
 
     public Handler registerForCourse = (req, res) -> {
@@ -78,7 +93,7 @@ public class Users {
         res.append("body", "User '" + user.getUsername()
                 + "' registered for courses + '"
                 + req.get("courseName") + "'.");
-        res.end();
+        res.end(true);
     };
 
     public Handler unregisterForCourse = (req, res) -> {
@@ -89,7 +104,7 @@ public class Users {
         res.append("body", "User '" + user.getUsername()
                 + "' unregistered for courses '"
                 + req.get("courseName") + "'.");
-        res.end();
+        res.end(true);
     };
 
     public Handler getAllUsers = (req, res) -> {
@@ -97,7 +112,7 @@ public class Users {
         db.col("users").find().forEach((Block<Document>)
                 (doc) -> users.add(doc.getString("username")));
         res.append("users", users);
-        res.end();
+        res.end(true);
     };
 }
 

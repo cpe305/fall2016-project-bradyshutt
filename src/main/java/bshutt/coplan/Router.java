@@ -69,13 +69,11 @@ public class Router {
         Courses courses = new Courses();
 
         this.register("getUser", users.getUser, new String[]{"username"});
-
         this.register("usernameIsAvailable", users.usernameIsAvailable, new String[]{"username"});
-
         this.register("createUser", users.createUser, new String[]{"username", "firstName", "lastName", "password"});
-
         this.register("removeUser", users.removeUser, new String[]{"username"});
-        this.register("authenticate", users.authenticate, new String[]{"username", "password"});
+        this.register("login", users.login, new String[]{"username", "password"});
+        this.register("checkJwt", users.checkJwt, new String[]{"jwt"});
         this.register("registerForCourse", users.registerForCourse, new String[]{"username", "courseName"});
         this.register("unregisterForCourse", users.unregisterForCourse, new String[]{"username", "courseName"});
         this.register("getAllUsers", users.getAllUsers);

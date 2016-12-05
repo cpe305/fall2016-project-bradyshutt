@@ -39,6 +39,6 @@ public class RouterTest {
         assertTrue(router.routeExists("getUser"));
         assertTrue(router.routeExists("usernameIsAvailable"));
         assertTrue(router.routeExists("registerForCourse"));
-        assertTrue(router.routeExists("authenticate"));
+        assertTrue(router.routeExists("login"));
     }
 }
