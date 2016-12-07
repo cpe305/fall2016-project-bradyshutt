@@ -32,21 +32,22 @@ export class AuthenticationService {
           // If jwt is present in response, login was successful.
           console.log('res:', res);
           let json = res.json();
+          console.log('json:', json);
           let jwt = json['jwt'];
           let user = json['user'];
           if (user && jwt) {
             localStorage.setItem('jwt', JSON.stringify(jwt));
-            localStorage.setItem('currentUser', JSON.stringify(user));
+            localStorage.setItem('user', JSON.stringify(user));
             resolve(user);
           } else {
-            reject();
+            reject("Invalid username or password.");
           }
         });
     });
   }
 
   logout() {
-    localStorage.removeItem('currentUser');
+    localStorage.removeItem('user');
     localStorage.removeItem('jwt');
   }
 

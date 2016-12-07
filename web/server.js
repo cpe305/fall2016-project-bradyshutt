@@ -24,8 +24,8 @@ app.post('/api/authenticate', (req, res) => {
         console.log('javaResponse', javaResponse);
         let clientRes = {
             status: javaResponse.status,
-            jwt: javaResponse.jwt,
-            user: javaResponse.user
+            jwt: javaResponse.jwt || null,
+            user: javaResponse.user || null
         };
         res.setHeader('Content-Type', 'text/json');
         res.send(JSON.stringify(clientRes));
@@ -35,9 +35,9 @@ app.post('/api/endpoint', (req, res) => {
     let msg = req.body.message;
     console.log('msg:', msg);
     javaBridge.send(JSON.stringify(msg), (javaResponse) => {
-        console.log('javaResponse', javaResponse);
+        //console.log('javaResponse', javaResponse);
         res.setHeader('Content-Type', 'text/json');
-        res.send(JSON.stringify(javaResponse));
+        res.json(JSON.stringify(javaResponse));
     });
 });
 app.use('', (req, res) => res.sendFile(__dirname + '/index.html'));

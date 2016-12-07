@@ -1,21 +1,24 @@
 package bshutt.coplan.models;
 
 import bshutt.coplan.Database;
+import bshutt.coplan.exceptions.DatabaseException;
+import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
+import org.bson.codecs.configuration.CodecRegistries;
+import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.conversions.Bson;
+
+import java.util.Collection;
 
 public abstract class Model<Type> {
 
     protected Database db = Database.getInstance();
-    private boolean existsInDB = false;
-    private MongoCollection col;
+    private MongoCollection<Document> col;
     private String collectionName;
     private String filterKey;
     private String filterValue;
     private Bson filter;
-    private String uniqueAttributeKey;
-    protected boolean hasUpdates = true;
 
     //public Document attributes;
 
@@ -26,11 +29,11 @@ public abstract class Model<Type> {
         //this.filterKey = this.db.filter(uniqueAttributeKey, uniqueAttributeValue);
     }
 
-    public Document loadModel(String uniqueValue) {
-        this.filterValue = uniqueValue;
+    public Document loadModel(String filterValue) {
+        this.filterValue = filterValue;
         this.filter = this.db.filter(this.filterKey, this.filterValue);
-        this.existsInDB = true;
-        return (Document) this.col.find(this.filter).first();
+        Document doc = this.col.find(this.filter).first();
+        return doc;
     }
 
 //    public String get(String key) {
@@ -52,24 +55,38 @@ public abstract class Model<Type> {
 //        return this.attributes;
 //    }
 
-    public void save() throws Exception {
-        if (!this.hasUpdates)
-            return;
+    public void save() throws DatabaseException {
         Document doc = this.toDoc();
         if (this.validate(doc)) {
-            if (this.existsInDB) {
-                this.col.findOneAndReplace(this.filter, doc);
+            if (this.existsInDB()) {
+                try {
+                    this.col.findOneAndReplace(this.filter, doc);
+                } catch (Exception exc) {
+                    throw new DatabaseException("Error with 'findOneAndReplace'", exc);
+                }
             } else {
                 this.col.insertOne(doc);
-                this.existsInDB = true;
             }
         }
-        this.hasUpdates = false;
+    }
+
+    public void setFilter() {
+        this.filterValue = this.getFilterValue();
+        this.filter = this.db.filter(this.filterKey, this.filterValue);
+    }
+
+    public boolean existsInDB() {
+        if (this.filterValue ==  null || this.filter == null) {
+            this.setFilter();
+        }
+        //System.out.println("filter: "+ this.filter.toBsonDocument(Document.class, MongoClient.getDefaultCodecRegistry()).toString());
+        return this.col.find(this.filter).first() != null;
     }
 
     //public abstract Type load(String filterVal) throws Exception;
-    public abstract boolean validate(Document doc) throws Exception;
-    public abstract Document toDoc() throws Exception;
-    public abstract Type fromDoc(Document doc) throws Exception;
+    public abstract boolean validate(Document doc);
+    public abstract String getFilterValue();
+    public abstract Document toDoc();
+    public abstract Type fromDoc(Document doc);
 
 }

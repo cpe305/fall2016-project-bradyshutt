@@ -3,6 +3,7 @@ import {Component, OnInit} from '@angular/core';
 import { UserService } from './services/user.service';
 import { User } from './user';
 import { Subscription } from 'rxjs/Subscription';
+import {Router} from "@angular/router";
 
 
 @Component({
@@ -14,10 +15,10 @@ import { Subscription } from 'rxjs/Subscription';
         <a routerLink="/dashboard"><li>Dashboard</li></a>
       </ul>
       <ul class="userBar" *ngIf="(user !== null)">
-        <a routerLink="/login"><li>Logout</li></a><li>{{user.username}}</li>
+        <a (click)="logout()"><li>Logout</li></a><a routerLink="/whoami"><li>{{user.username}}</li></a>
       </ul>
       <ul class="userBar" *ngIf="(user === null)">
-        <li>Sign Up</li><a routerLink="/login"><li>Login</li></a>
+        <a routerLink="/signup"><li>Sign Up</li></a><a routerLink="/login"><li>Login</li></a>
       </ul>
     </div>
     <router-outlet></router-outlet>
@@ -50,7 +51,7 @@ import { Subscription } from 'rxjs/Subscription';
       border-right: 1px solid #595959;
     }
     
-    ul.navBar li:hover {
+    ul li:hover {
       background-color: #444;
     }
     
@@ -70,15 +71,48 @@ import { Subscription } from 'rxjs/Subscription';
     }
   `]
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   user: User = null;
   subscription: Subscription;
 
-  constructor(userService: UserService) {
-    this.user = userService.currentUser() || null;
-    this.subscription = userService.userChanged.subscribe((newStatus) => {
+  constructor(
+    private userService: UserService,
+    private router: Router) { };
+
+  logout() {
+    this.userService.logout();
+    this.router.navigate(['/login']);
+  }
+
+  ngOnInit(): void {
+    this.user = this.userService.currentUser();
+    if (!this.user) {
+      setTimeout(() => this.logout(), 500);
+      return;
+    }
+    console.log('youuser', this.user);
+    if (this.user) {
+      this.userService.refreshCurrentUser().then(
+          user => {
+            console.log('Made itt.');
+            this.user = user;
+            console.log('user: ', user);
+          },
+          err => {
+            console.log('could not refresh current user.');
+            console.log('err: ', err);
+            this.router.navigate(["/login"]);
+          }
+      )
+        .catch((reject) => {
+          console.log('oops');
+          console.log('rejected: ', reject);
+
+        })
+    }
+    this.subscription = this.userService.userChanged.subscribe((newStatus) => {
       console.log('newStatus', newStatus);
-      this.user = userService.currentUser();
+      this.user = this.userService.currentUser();
     });
   }
 

@@ -1,5 +1,7 @@
 package bshutt.coplan;
 
+import bshutt.coplan.exceptions.JwtException;
+import bshutt.coplan.exceptions.UserDoesNotExistException;
 import bshutt.coplan.models.User;
 import org.bson.Document;
 
@@ -9,7 +11,7 @@ public class Request {
 
     public String route;
     public Document data;
-    private User user;
+    public User user;
 
     public Request() { }
 
@@ -32,18 +34,24 @@ public class Request {
         return this.data.get(key, type);
     }
 
-    public User getUser() throws Exception {
+    public User getUser() throws UserDoesNotExistException, JwtException {
         String username = this.get("username");
-        if (username == null) {
-            return null;
+        String jwt = this.get("jwt");
+        if (username != null) {
+            try {
+                this.user = User.load(username);
+            } catch (UserDoesNotExistException uDNE) {
+
+            }
+        } else if (jwt != null) {
+            this.user = this.getUserFromJwt(jwt);
         } else {
-            this.user = User.load(username);
-            return this.user;
+            this.user = null;
         }
+        return this.user;
     }
 
-    public User getUserFromJwt() throws Exception {
-        String jwt = this.get("jwt");
+    public User getUserFromJwt(String jwt) throws UserDoesNotExistException, JwtException {
         if (jwt == null) {
             return null;
         } else {

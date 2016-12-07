@@ -2,6 +2,8 @@
 
 
 import { Component } from '@angular/core';
+import {UserService} from "./services/user.service";
+import {User} from "./user";
 
 const MOCK_USER = {
   username: 'bshutt',
@@ -18,17 +20,17 @@ const MOCK_USER = {
 @Component({
   selector: 'whoami',
   template: `
-    <div *ngIf="currentUser">
-      <h1>Hello, {{currentUser.firstName}}!</h1>
-      <label>Username: </label> {{currentUser.username}} <br>
-      <label>First Name: </label> {{currentUser.firstName}} <br>
-      <label>Last Name: </label> {{currentUser.lastName}} <br>
+    <div *ngIf="user">
+      <h1>Hello, {{user.firstName}}!</h1>
+      <label>Username: </label> {{user.username}} <br>
+      <label>First Name: </label> {{user.firstName}} <br>
+      <label>Last Name: </label> {{user.lastName}} <br>
       <label>Courses: </label> 
       <ul>
-        <li *ngFor="let course of currentUser.courses">{{course}}</li>
+        <li *ngFor="let course of user.courses">{{course}}</li>
       </ul>
     </div>
-    <div *ngIf="!currentUser">
+    <div *ngIf="!user">
       <h1>Sorry, you aren't logged in :(</h1>
     </div>
   `
@@ -36,11 +38,10 @@ const MOCK_USER = {
 
 
 export class CurrentUser {
-  currentUser: any;
+  user: User;
 
-  constructor() {
-    this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
+  constructor(private userService: UserService) {
+    this.user = this.userService.currentUser();
   }
-  //user = null;
 }
 

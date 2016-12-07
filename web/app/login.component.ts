@@ -20,19 +20,30 @@ import { UserService } from './services/user.service';
             <label for="password">Password</label>
             <input type="password" name="password" [(ngModel)]="model.password" />
         </div>
+        <div class="incorrectPassword" *ngIf="(incorrectPassword)">
+          <p>* Incorrect username or password.</p>
+        </div>
         <div class="form-group">
             <button type="submit">Login</button>
-            <a [routerLink]="['/register']" class="btn btn-link">Register</a>
         </div>
       </form>
-    
+      <div>
+        <p>Don't have an account? <a [routerLink]="['/signup']" class="btn btn-link">Sign up here</a>.</p>
+      </div>
+            
     </div>
 
   `,
+  styles: [`
+    .incorrectPassword {
+      color: red;
+    }
+  `]
 })
 export class LoginComponent implements OnInit {
   model: any = { };
   loading = false;
+  incorrectPassword: boolean = false;
 
   constructor(
     private router: Router,
@@ -47,8 +58,7 @@ export class LoginComponent implements OnInit {
           this.router.navigate(['/dashboard'])
         },
         err => {
-          console.log('Communication Error.');
-          console.log(err);
+          this.incorrectPassword = true;
           this.loading = false;
         }
       );
@@ -57,9 +67,6 @@ export class LoginComponent implements OnInit {
 
   ngOnInit(): void {
     this.userService.logout();
-    console.log('ngOnInit for login component');
-
-    //this.router.navigate(['/login'])
   }
 }
 

@@ -14,6 +14,8 @@ import { LoginComponent } from './login.component';
 import { AuthenticationService } from './services/authentication.service';
 import { HttpModule } from '@angular/http';
 import { MessagingService } from  './services/messaging.service';
+import { SignUpComponent } from './signup.component';
+import { AllUsersComponent } from "./all-users.component";
 
 
 @NgModule({
@@ -33,6 +35,14 @@ import { MessagingService } from  './services/messaging.service';
       {
         path: 'login',
         component: LoginComponent
+      },
+      {
+        path: 'signup',
+        component: SignUpComponent
+      },
+      {
+        path: 'all-users',
+        component: AllUsersComponent
       }
     ])
   ],
@@ -42,7 +52,9 @@ import { MessagingService } from  './services/messaging.service';
     MainContent,
     Dashboard,
     CurrentUser,
-    LoginComponent
+    LoginComponent,
+    SignUpComponent,
+    AllUsersComponent
   ],
   providers: [
     UserService,

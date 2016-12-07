@@ -9,7 +9,7 @@ export class MessagingService {
 
   constructor(private http: Http) {};
 
-  sendMessage(msg: Object) {
+  sendMessage(msg: Object): Promise<any> {
 
     let headers = new Headers();
     headers.append('Content-Type', 'application/json');
@@ -24,9 +24,11 @@ export class MessagingService {
     return new Promise((resolve, reject) => {
       this.http.request(new Request(requestOpts))
         .subscribe((res) => {
-          console.log('res:', res);
-          let json = res.json();
-          resolve(json);
+          let json = JSON.parse(res.json());
+          if (json.res === 1)
+            resolve(json);
+          else
+            reject(json)
         });
     });
   }

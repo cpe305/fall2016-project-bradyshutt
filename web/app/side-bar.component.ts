@@ -5,6 +5,7 @@ import { Component, Injectable, OnInit } from '@angular/core';
 import { UserService } from './services/user.service' ;
 import { User } from './user';
 import { Course } from './course';
+import {Subscription} from "rxjs";
 
 
 @Component({
@@ -25,8 +26,8 @@ import { Course } from './course';
           <button (click)="addCourseCancel()">Cancel</button>
         </div>
         <ul>
-          <li *ngFor="let course of courses">
-            {{course.name}}
+          <li *ngFor="let courseName of user.courses">
+            {{courseName}}
           </li>
         </ul>
       </div>
@@ -37,6 +38,7 @@ import { Course } from './course';
       background-color: red;
       display: block;
       width: 15%;
+      min-width: 250px;
       height: 100%;
       float: left;
       padding-bottom: 9999px;
@@ -76,17 +78,17 @@ export class SideBar implements OnInit {
   model: any = {};
   private user: User;
   private addingCourses: boolean = false;
-  private courses: Course[];
+  private subscription: Subscription;
 
   constructor(private userService: UserService) {}
 
   ngOnInit(): void {
     this.user = this.userService.currentUser();
-    //this.courses = this.user.courses;
-    this.courses = [
-      {id: 1, name: 'CPE-305', pins: ['pin1', 'pin2', 'pin3'] },
-      {id: 2, name: 'CSC-445', pins: ['pin4', 'pin5', 'pin6'] }
-    ]
+
+    this.subscription = this.userService.userChanged.subscribe((newStatus) => {
+      console.log('newStatus', newStatus);
+      this.user = this.userService.currentUser();
+    });
   }
 
   addCourseInit() {
@@ -100,11 +102,18 @@ export class SideBar implements OnInit {
   addCourseSubmit() {
     let collegeName: String = this.model.college;
     let courseNumber: Number = this.model.number;
-    let course:String = collegeName.toUpperCase() + '-' + courseNumber;
+    let courseName:String = collegeName.toUpperCase() + '-' + courseNumber;
+    console.log('course about to add: ', courseName);
+    if (this.user.courses.find((course) => course.name === courseName)) {
+      alert("You've already registered for this course.");
+      return;
+    }
 
-    console.log('course about to add: ', course);
-
-    this.userService.addCourse(course);
+    this.userService.addCourse(courseName).then(
+      course => {
+        console.log('course added successfully!');
+      }
+    );
     this.addingCourses = false;
   }
 

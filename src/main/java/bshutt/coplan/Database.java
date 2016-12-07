@@ -1,5 +1,6 @@
 package bshutt.coplan;
 
+import bshutt.coplan.exceptions.DatabaseException;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
@@ -49,22 +50,16 @@ public class Database {
                 new IndexOptions().unique(true));
     }
 
-    public MongoCollection<Document> col(String colName) throws DbException {
+    public MongoCollection<Document> col(String colName) throws DatabaseException {
         MongoCollection<Document> collection = this.db.getCollection(colName);
         if (collection == null)
-            throw new DbException("Collection '" + colName + "' not found!");
+            throw new DatabaseException("Collection '" + colName + "' not found!");
         else
             return collection;
     }
 
     public Bson filter(String key, String val) {
         return Filters.eq(key, val);
-    }
-
-    public class DbException extends Exception {
-        public DbException(String msg) {
-            super(msg);
-        }
     }
 
 }

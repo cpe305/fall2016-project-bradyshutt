@@ -4,20 +4,19 @@ import org.bson.Document;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import bshutt.coplan.Request;
 
 public class Response {
 
     private Document doc;
     public boolean isDone = false;
+    private Request request;
 
-    private static final String GOOD = "good";
-    private static final String LOG = "log";
-    private static final String ERR = "error";
-
-    public Response() {
+    public Response(Request req) {
+        this.request = req;
         this.doc = new Document();
-        this.doc.append("type", Response.GOOD);
-        this.doc.append("body", new Document());
+        this.doc.append("res", 1);
+        this.doc.append("route", this.request.route);
     }
 
     public Response append(String key, Object obj) {
@@ -26,30 +25,29 @@ public class Response {
     }
 
     public static void log(String message) {
-        Response r = new Response();
-        r.append("type", Response.LOG);
+        Response r = new Response(null);
         r.append("msg", message);
         r.end();
     }
 
     public static void log(Document doc) {
-        Response r = new Response();
-        r.append("type", Response.LOG);
+        Response r = new Response(null);
         r.append("msg", doc);
         r.end();
     }
 
     public Response setResponse(Document doc) {
-        this.doc = new Document();
-        this.doc.append("type", Response.GOOD);
-        this.doc.append("body", doc);
+        this.doc = new Document(null);
+        this.doc.append("res", 1);
+        this.doc.append("route", this.request.route);
+        doc.forEach((key, val) -> this.doc.append(key, val));
         this.end();
         return this;
     }
 
     public Response setResponse(String msg) {
         this.doc = new Document();
-        this.doc.append("type", Response.GOOD);
+        this.doc.append("res", 1);
         this.doc.append("message", msg);
         this.end();
         return this;
@@ -57,39 +55,49 @@ public class Response {
 
     public Response err(Exception exc) {
         this.doc = new Document();
-        this.doc.append("type", Response.ERR);
+        this.doc.append("res", 0);
+        this.doc.append("route", this.request.route);
         this.doc.append("errMessage", exc.getMessage());
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        exc.printStackTrace(pw);
-        String stackTrace = sw.toString();
-        this.doc.append("stackTrace", stackTrace);
+        this.doc.append("exceptionCause", exc.getCause().toString());
         this.end();
         return this;
     }
 
-    public Response err(String errMsg, Request req) {
+    public Response err(String errMsg) {
         this.doc = new Document();
-        this.doc.append("type", Response.ERR);
+        this.doc.append("res", 0);
+        this.doc.append("route", this.request.route);
         this.doc.append("errMessage", errMsg);
-        this.doc.append("req", req.pack());
+        this.doc.append("request", this.request.pack());
         this.end();
         return this;
     }
 
-    public Response err(Exception exc, Request req) {
+    public Response err(String errMsg, Exception exc) {
         this.doc = new Document();
-        this.doc.append("type", Response.ERR);
-        this.doc.append("msg", exc.getMessage());
-        this.doc.append("req", req.pack());
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        exc.printStackTrace(pw);
-        String stackTrace = sw.toString();
-        this.doc.append("stackTrace", stackTrace);
+        this.doc.append("res", 0);
+        this.doc.append("route", this.request.route);
+        this.doc.append("errMessage", errMsg);
+        this.doc.append("stackTrace", exc.getMessage());
+        this.doc.append("request", this.request.pack());
         this.end();
         return this;
     }
+
+//    public Response err(Exception exc) {
+//        this.doc = new Document();
+//        this.doc.append("res", 0);
+//        this.doc.append("exception", exc.toString());
+//        this.doc.append("req", this.request.pack());
+//        StringWriter sw = new StringWriter();
+//        PrintWriter pw = new PrintWriter(sw);
+//        exc.printStackTrace(pw);
+//        String stackTrace = sw.toString();
+//        this.doc.append("stackTrace", stackTrace);
+//        this.doc.append("request", this.request.pack());
+//        this.end();
+//        return this;
+//    }
 
     public Response end() {
         if (this.isDone) {
@@ -101,30 +109,30 @@ public class Response {
         }
     }
 
-    public Response end(String msg) {
-        this.doc.append("message", msg);
-        if (this.isDone) {
-            throw new Error("This response has already finished. You can't end it again.");
-        } else {
-            System.out.println(doc.toJson());
-            this.isDone = true;
-            return this;
-        }
-    }
+//    public Response end(String msg) {
+//        this.doc.append("message", msg);
+//        if (this.isDone) {
+//            throw new Error("This response has already finished. You can't end it again.");
+//        } else {
+//            System.out.println(doc.toJson());
+//            this.isDone = true;
+//            return this;
+//        }
+//    }
 
     public Response end(Boolean status) {
-        this.doc.append("status", status? "good" : "bad");
+        this.doc.append("res", status? 1 : 0);
         if (this.isDone) {
             throw new Error("This response has already finished. You can't end it again.");
         } else {
-            System.out.println(doc.toJson());
+            System.out.println(this.doc.toJson());
             this.isDone = true;
             return this;
         }
     }
 
     public Response end(Boolean status, String msg) {
-        this.doc.append("status", status? "good" : "bad");
+        this.doc.append("res", status? 1 : 0);
         this.doc.append("message", msg);
         if (this.isDone) {
             throw new Error("This response has already finished. You can't end it again.");
