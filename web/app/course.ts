@@ -1,18 +1,16 @@
 'use strict';
 
 export class Course {
-  id: Number;
-  name: String;
-  registeredUsers: String[];
-  pins: String[];
+  id: number;
+  name: string;
+  registeredUsers: string[];
+  pins: string[];
 
   constructor(attributes) {
     this.id = attributes.id || null;
-    this.name = attributes.name;
+    this.name = attributes.courseName;
     this.registeredUsers = attributes.registeredUsers;
     this.pins = attributes.pins;
-
-
   }
 }
 

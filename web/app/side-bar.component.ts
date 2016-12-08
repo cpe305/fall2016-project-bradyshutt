@@ -26,8 +26,8 @@ import {Subscription} from "rxjs";
           <button (click)="addCourseCancel()">Cancel</button>
         </div>
         <ul>
-          <li *ngFor="let courseName of user.courses">
-            {{courseName}}
+          <li *ngFor="let course of user?.courses" (click)="onSelectCourse(course)">
+            {{course.name}}
           </li>
         </ul>
       </div>
@@ -75,7 +75,10 @@ import {Subscription} from "rxjs";
 })
 
 export class SideBar implements OnInit {
-  model: any = {};
+  model: {college: string, number: number} = {
+    college: null,
+    number: null
+  };
   private user: User;
   private addingCourses: boolean = false;
   private subscription: Subscription;
@@ -85,9 +88,10 @@ export class SideBar implements OnInit {
   ngOnInit(): void {
     this.user = this.userService.currentUser();
 
-    this.subscription = this.userService.userChanged.subscribe((newStatus) => {
-      console.log('newStatus', newStatus);
-      this.user = this.userService.currentUser();
+    this.subscription = this.userService.userChanged.subscribe((userChange) => {
+      console.log('newStatus', userChange.change);
+      this.user = userChange.user;
+      console.log(this.user.courses);
     });
   }
 
@@ -97,6 +101,10 @@ export class SideBar implements OnInit {
 
   addCourseCancel() {
     this.addingCourses = false;
+  }
+
+  onSelectCourse(course: Course) {
+    console.log(course);
   }
 
   addCourseSubmit() {

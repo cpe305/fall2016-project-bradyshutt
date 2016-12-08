@@ -47,6 +47,10 @@ main() {
          sudo mongod --dbpath=.mongodatabase --port 27017
          ;;
 
+      'startredis')
+         sudo redis-server
+         ;;
+
       'jar')
          java -jar target/coplan-1.0-SNAPSHOT.jar
          ;;

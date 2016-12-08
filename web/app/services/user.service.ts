@@ -13,8 +13,10 @@ import {Course} from "../course";
 
 @Injectable()
 export class UserService {
-  private userChangedSource = new Subject<String>();
-  userChanged = this.userChangedSource.asObservable();
+
+  userChanged: Subject<UserChange> = new Subject<UserChange>();
+  userLoggedOut: Subject<string> = new Subject<string>();
+  //userChanged = this.userChangedSource.asObservable();
 
   constructor(
     private authenticationService: AuthenticationService,
@@ -31,8 +33,16 @@ export class UserService {
     let userData = JSON.parse(localStorage.getItem('user')) || null;
     if (!userData) return null;
     let user = new User(userData);
-    console.log('user: ', user);
     return user;
+  }
+
+  getCourseNames(): Promise<string[]> {
+    let jwt: string = JSON.parse(localStorage.getItem("jwt"));
+    return Promise.resolve()
+      .then( () => this.messagingService.sendMessage({route: 'getUserCourses', data: {jwt: jwt}}))
+      .then(
+        res => res.courses,
+        err => Promise.reject(err));
   }
 
   refreshCurrentUser(): Promise<User> {
@@ -52,17 +62,20 @@ export class UserService {
         });
   }
 
-
   logout(): any {
     this.authenticationService.logout();
-    this.userChangedSource.next('logout');
+    this.userLoggedOut.next('');
   }
 
   login(username: String, password: String): any {
-    return this.authenticationService.login(username, password)
-      .then( success => {
-        this.userChangedSource.next('login');
-        return Promise.resolve(success);
+    return this.authenticationService.login(username, password).then(
+      user => {
+        this.userChanged.next({change: 'login', user: user});
+        return Promise.resolve(user);
+      },
+      invalid => {
+        console.log('res', invalid);
+        console.log('username/pass incorrect');
       });
   }
 
@@ -85,7 +98,7 @@ export class UserService {
         let user: User = new User(userDocument);
         localStorage.setItem('jwt', JSON.stringify(jwt));
         localStorage.setItem('user', JSON.stringify(user));
-        this.userChangedSource.next('login');
+        this.userChanged.next({change: 'login', user: user});
         return Promise.resolve(user);
       },
 
@@ -113,11 +126,42 @@ export class UserService {
     return this.messagingService.sendMessage(message).then(
       response => {
         let course: Course = new Course(response.course);
-        this.userChangedSource.next('newCourse');
+        let updatedUser: User = new User(response.user);
+        this.userChanged.next({change: 'newCourse', user: updatedUser});
         return Promise.resolve(course);
       },
       () => Promise.reject(null)
     );
   }
 
+  addPinToCourse(newPin: any, courseName: string): Promise<Course> {
+    let user = this.currentUser();
+    let message = {
+      route: 'registerForCourse',
+      data: {
+        username: user.username,
+        jwt: JSON.parse(localStorage.getItem("jwt")),
+        courseName: courseName,
+        pin: newPin
+      }
+    };
+
+    console.log('pre-msg:', message);
+    return this.messagingService.sendMessage(message).then(
+      response => {
+        console.log('pin added successfully! woot!');
+        console.log('response: ', response);
+      },
+
+      err => {
+        console.log('error occurred: ', err);
+
+      });
+  }
 }
+
+class UserChange {
+  change: String;
+  user: User;
+}
+

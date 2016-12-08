@@ -3,6 +3,9 @@ package bshutt.coplan.models;
 import com.auth0.jwt.JWTSigner;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.JWTVerifyException;
+import com.mongodb.MongoClient;
+import org.bson.BsonArray;
+import org.bson.BsonValue;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.mindrot.jbcrypt.BCrypt;
@@ -17,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import bshutt.coplan.Database;
+import bshutt.coplan.models.Course;
 import bshutt.coplan.exceptions.*;
 
 public class User extends Model<User> {
@@ -138,17 +142,50 @@ public class User extends Model<User> {
     }
 
     public Document toClientDoc() {
-        String jwt;
-        try {
-            jwt = this.getJwt();
-        } catch (DatabaseException e) {
-            jwt = null;
-        }
         Document doc = new Document("username", this.username)
                 .append("firstName", this.firstName)
                 .append("lastName", this.lastName)
                 .append("courses", this.courses)
                 .append("email", this.email);
+        return doc;
+    }
+
+    public Document toClientDoc(boolean includeCourseDetails) {
+        Document doc = new Document("username", this.username)
+                .append("firstName", this.firstName)
+                .append("lastName", this.lastName)
+                .append("email", this.email);
+        if (includeCourseDetails) {
+            try {
+                doc.append("courses", this.getCourseDetails().get("courses"));
+            } catch (DatabaseException | CourseValidationException exc) {
+                doc.append("courses", null);
+            }
+        } else {
+            doc.append("courses", this.courses);
+        }
+        return doc;
+    }
+
+    public Document getCourseDetails() throws DatabaseException, CourseValidationException {
+        ArrayList courses = new ArrayList();
+        for (String courseName : this.courses) {
+            Course course = Course.load(courseName);
+            Document courseDoc = course.toClientDoc();
+            courses.add(courseDoc);
+        }
+        Document doc = new Document();
+        doc.append("courses", courses);
+        return doc;
+    }
+
+    public Document replaceNamesWithDetails(Document doc) throws DatabaseException, CourseValidationException {
+        ArrayList<Document> courses = new ArrayList<Document>();
+        for (String courseName : doc.get("courses", String[].class)) {
+            Course course = Course.load(courseName);
+            courses.add(course.toClientDoc());
+        }
+        doc.put("courses", courses.toArray());
         return doc;
     }
 

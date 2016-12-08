@@ -39,11 +39,12 @@ let JavaApp = (onRecMsgFn) => {
     javaApp.stderr.on('data', (data) => {
       console.log('JavaApp threw an uncaught exception:');
       console.log(data.toString())
+      javaApp.kill()
     });
 
     javaApp.on('exit', (code, signal) => {
-      isAlive = false;
       console.log(`JavaApp <EXITED>: Code[${code}] Signal:[${signal}]`);
+      javaApp.kill();
     });
 
     javaApp.on('error', (err) => {
@@ -51,6 +52,7 @@ let JavaApp = (onRecMsgFn) => {
       Error.captureStackTrace(err);
       console.log(err.message);
       console.log(err)
+      javaApp.kill();
     });
 
     function isJson(str) {
@@ -86,8 +88,12 @@ let JavaApp = (onRecMsgFn) => {
           : 'Java is not still alive')
       },
 
-      kill() {
-        javaApp.kill()
+      killJavaApp() {
+        if (isAlive) {
+          javaApp.kill()
+          console.log('Killing the java app');
+          isAlive = false;
+        }
       }
 
     }

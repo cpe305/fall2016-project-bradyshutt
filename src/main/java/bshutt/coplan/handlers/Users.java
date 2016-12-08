@@ -1,14 +1,16 @@
 package bshutt.coplan.handlers;
 
+import java.util.ArrayList;
+
+import bshutt.coplan.models.Pin;
+import com.mongodb.Block;
+import org.bson.Document;
+
 import bshutt.coplan.Database;
 import bshutt.coplan.Handler;
 import bshutt.coplan.exceptions.*;
 import bshutt.coplan.models.Course;
 import bshutt.coplan.models.User;
-import com.mongodb.Block;
-import org.bson.Document;
-
-import java.util.ArrayList;
 
 public class Users {
 
@@ -22,8 +24,7 @@ public class Users {
             if (user == null) {
                 res.err("User '" + username + "' not found!");
                 return;
-            }
-            else {
+            } else {
                 res.append("user", user.toDoc());
                 res.end(true);
             }
@@ -50,15 +51,51 @@ public class Users {
             res.err("Jwt error", e);
             return;
         }
-        if (jwtIsValid) {
-            res.append("message", "JWT validated successfully.");
-            res.append("user", req.user.toClientDoc());
-            res.append("jwt", jwt);
-            res.end(true);
-        } else {
+
+        if (!jwtIsValid) {
             res.append("errorMessage", "JWT not validated.");
             res.end(false);
         }
+
+        res.append("message", "JWT validated successfully.");
+        res.append("user", req.user.toClientDoc(true));
+
+//        try {
+//            res.append("courses", req.user.getCourseDetails());
+//        } catch (DatabaseException | CourseValidationException exc) {
+//            res.err("Error getting course details", exc);
+//            return;
+//        }
+        res.end(true);
+    };
+
+    public Handler getUserCourses = (req, res) -> {
+        try {
+            res.append("courses", req.user.getCourseDetails().get("courses"));
+        } catch (DatabaseException | CourseValidationException exc) {
+            res.err("Error getting course details", exc);
+            return;
+        }
+        res.end(true);
+    };
+
+    public Handler userAddPinToBoard = (req, res) -> {
+        String courseName = req.get("courseName");
+        Course course = null;
+        try {
+            course = Course.load(courseName);
+        } catch (CourseValidationException | DatabaseException exc) {
+            res.err("error loading course", exc);
+            return;
+        }
+        Pin pin = Pin.fromDoc(req.get("pin", Document.class));
+        try {
+            course.addPin(pin);
+        } catch (DatabaseException exc) {
+            res.err("error adding pin to course", exc);
+        }
+        res.append("user", req.user);
+        res.end(true);
     };
 
     public Handler createUser = (req, res) -> {
@@ -86,7 +123,8 @@ public class Users {
 
             res.append("createdUser", "success");
             res.append("jwt", jwt);
-            res.append("user", user.toClientDoc());
+            res.append("user", user.toClientDoc(true));
+            //res.append("courses", null);
             res.end(true);
         } else {
             res.err("Invalid data params for creating a user");
@@ -98,6 +136,7 @@ public class Users {
         String username = req.data.getString("username");
         try {
             this.db.col("users").findOneAndDelete(this.db.filter("username", username));
+            this.db.col("courses").deleteMany(this.db.filter("registeredUsers", username));
         } catch (DatabaseException exc) {
             res.err("There was an error removing the user", exc);
             return;
@@ -145,7 +184,6 @@ public class Users {
         } catch (InvalidPasswordException ipe) {
             res.append("errorMessage", "Invalid password.").end(false);
             return;
-
         } catch (UserDoesNotExistException udne) {
             res.append("errorMessage", "User '" + username + "' does not exist.").end(false);
             return;
@@ -158,8 +196,9 @@ public class Users {
             res.err("There was a Database error", exc);
             return;
         }
+
         res.append("jwt", jwt);
-        res.append("user", user.toDoc());
+        res.append("user", user.toClientDoc(true));
         res.end(true);
     };
 
@@ -179,7 +218,7 @@ public class Users {
         try {
             course.registerUser(user.getUsername());
         } catch (CourseRegistrationException exc) {
-            res.append("body", "User '" + user.getUsername()
+            res.append("message", "User '" + user.getUsername()
                     + "' is already registered for '"
                     + req.get("courseName") + "'.");
             res.end(false);
@@ -196,10 +235,11 @@ public class Users {
             return;
         }
 
-        res.append("body", "User '" + user.getUsername()
+        res.append("message", "User '" + user.getUsername()
                 + "' registered for course + '"
                 + req.get("courseName") + "'.");
-        res.append("course", course.toDoc());
+        //res.append("course", course.toClientDoc(true));
+        res.append("user", user.toClientDoc(true));
         res.end(true);
     };
 
@@ -236,9 +276,11 @@ public class Users {
             res.err("There was a database error.", exc);
             return;
         }
-        res.append("body", "User '" + user.getUsername()
+        res.append("message", "User '" + user.getUsername()
                 + "' unregistered for courses '"
                 + req.get("courseName") + "'.");
+        //res.append("course", course.toClientDoc(true));
+        res.append("user", user.toClientDoc(true));
         res.end(true);
     };
 

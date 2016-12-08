@@ -14,7 +14,7 @@ export class User {
     this.username = attributes.username;
     this.firstName = attributes.firstName;
     this.lastName = attributes.lastName;
-    this.courses = attributes.courses;
+    this.courses = attributes.courses.map( courseDoc => new Course(courseDoc));
     this.jwt = attributes.jwt;
   }
 

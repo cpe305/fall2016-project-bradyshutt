@@ -1,21 +1,20 @@
-import { NgModule }      from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
-
+import { HttpModule } from '@angular/http';
+import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
+import { AllUsersComponent } from './all-users.component';
 import { AppComponent }  from './app.component';
-import { Dashboard } from './dashboard.component';
-import { MainContent } from './main-content.component';
-import { SideBar } from './side-bar.component';
-import { UserService } from './services/user.service';
-import { CurrentUser } from './current-user.component';
-import { LoginComponent } from './login.component';
 import { AuthenticationService } from './services/authentication.service';
-import { HttpModule } from '@angular/http';
+import { CurrentUser } from './current-user.component';
+import { Dashboard } from './dashboard.component';
+import { LoginComponent } from './login.component';
+import { MainContent } from './main-content.component';
 import { MessagingService } from  './services/messaging.service';
+import { SideBar } from './side-bar.component';
 import { SignUpComponent } from './signup.component';
-import { AllUsersComponent } from "./all-users.component";
+import { UserService } from './services/user.service';
 
 
 @NgModule({
@@ -65,3 +64,4 @@ import { AllUsersComponent } from "./all-users.component";
 })
 
 export class AppModule { }
+

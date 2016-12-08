@@ -258,7 +258,123 @@ public class UsersTest {
             Document detailsResponse = router.route(detailsRequest).getDoc();
             assertEquals(0, detailsResponse.get("res"));
         });
+    }
 
+    @Test
+    public void testGetAllUsers() {
+        this.testUser("_test_1", "123", (user1, doc1) -> {
+            this.testUser("_test_2", "123", (user2, doc2) -> {
+                this.testUser("_test_3", "123", (user3, doc3) -> {
+                    Document allUsers = router.route(new RequestBuilder()
+                            .setRoute("getAllUsers")
+                            .end()).getDoc();
+
+                    ArrayList<String> users = allUsers.get("users", ArrayList.class);
+                    assertTrue(users.contains("_test_1"));
+                    assertTrue(users.contains("_test_2"));
+                    assertTrue(users.contains("_test_3"));
+
+                });
+            });
+        });
+    }
+
+    @Test
+    public void testGetUserCourses() {
+        this.testUser((user, doc) -> {
+            String jwt = doc.getString("jwt");
+
+            Document login = router.route(new RequestBuilder()
+                    .setRoute("getUserDetails")
+                    .addData("jwt", jwt)
+                    .done()).getDoc();
+            assertEquals(1, login.get("res"));
+
+            Document registerForCourse = router.route(new RequestBuilder()
+                    .setRoute("registerForCourse")
+                    .addData("jwt", jwt)
+                    .addData("courseName", "CPE-101")
+                    .done()).getDoc();
+            assertEquals(1, registerForCourse.get("res"));
+
+            Document registerForAnotherCourse = router.route(new RequestBuilder()
+                    .setRoute("registerForCourse")
+                    .addData("jwt", jwt)
+                    .addData("courseName", "PHIL-331")
+                    .done()).getDoc();
+            assertEquals(1, registerForAnotherCourse.get("res"));
+
+            Document getUserCourses = router.route(new RequestBuilder()
+                    .setRoute("getUserCourses")
+                    .addData("jwt", jwt)
+                    .done()).getDoc();
+            assertEquals(1, getUserCourses.get("res"));
+            ArrayList<Document> courses = getUserCourses.get("courses", ArrayList.class);
+            final boolean[] hasCPE101_A = {false};
+            final boolean[] hasPHIL331_A = {false};
+            courses.forEach((course) -> {
+                String courseName = course.getString("courseName");
+                if (courseName.equals("PHIL-331")) {
+                    hasPHIL331_A[0] = true;
+                } else if (courseName.equals("CPE-101")) {
+                    hasCPE101_A[0] = true;
+                }
+            });
+            assertTrue(hasCPE101_A[0]);
+            assertTrue(hasPHIL331_A[0]);
+
+            Document unregisterForCourse = router.route(new RequestBuilder()
+                    .setRoute("unregisterForCourse")
+                    .addData("jwt", jwt)
+                    .addData("courseName", "PHIL-331")
+                    .done()).getDoc();
+            assertEquals(1, unregisterForCourse.get("res"));
+
+            Document getUserCourses_B = router.route(new RequestBuilder()
+                    .setRoute("getUserCourses")
+                    .addData("jwt", jwt)
+                    .done()).getDoc();
+            assertEquals(1, getUserCourses_B.get("res"));
+            ArrayList<Document> courses_B = getUserCourses_B.get("courses", ArrayList.class);
+            final boolean[] hasCPE101_B = {false};
+            final boolean[] hasPHIL331_B = {false};
+            courses_B.forEach((course) -> {
+                String courseName = course.getString("courseName");
+                if (courseName.equals("PHIL-331")) {
+                    hasPHIL331_B[0] = true;
+                } else if (courseName.equals("CPE-101")) {
+                    hasCPE101_B[0] = true;
+                }
+            });
+            assertTrue(hasCPE101_B[0]);
+            assertFalse(hasPHIL331_B[0]);
+
+            Document unregisterForAnotherCourse = router.route(new RequestBuilder()
+                    .setRoute("unregisterForCourse")
+                    .addData("jwt", jwt)
+                    .addData("courseName", "CPE-101")
+                    .done()).getDoc();
+            assertEquals(1, unregisterForAnotherCourse.get("res"));
+
+            Document getUserCourses_C = router.route(new RequestBuilder()
+                    .setRoute("getUserCourses")
+                    .addData("jwt", jwt)
+                    .done()).getDoc();
+            assertEquals(1, getUserCourses_C.get("res"));
+            ArrayList<Document> courses_C = getUserCourses_C.get("courses", ArrayList.class);
+            final boolean[] hasCPE101_C = {false};
+            final boolean[] hasPHIL331_C = {false};
+            courses_C.forEach((course) -> {
+                String courseName = course.getString("courseName");
+                if (courseName.equals("PHIL-331")) {
+                    hasPHIL331_C[0] = true;
+                } else if (courseName.equals("CPE-101")) {
+                    hasCPE101_C[0] = true;
+                }
+            });
+            assertFalse(hasCPE101_C[0]);
+            assertFalse(hasPHIL331_C[0]);
+        });
     }
 
     @Test
@@ -298,7 +414,6 @@ public class UsersTest {
                 .end();
         return router.route(req).getDoc();
     }
-
 
     private void deleteUsers(String[] usernames) {
         for (String username : usernames) {

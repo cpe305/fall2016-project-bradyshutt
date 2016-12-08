@@ -17,7 +17,7 @@ public class Course extends Model<Course> {
     public String courseName;
     private ArrayList<String> registeredUsers;
     //private ArrayList<Pin> pins;
-    private ArrayList<String> pins;
+    private String jsonPins;
 
 
     public Course() {
@@ -37,7 +37,7 @@ public class Course extends Model<Course> {
             course.setCourseName(courseName);
             //course.board = new Board(courseName);
             //course.pins = new ArrayList<Pin>();
-            course.pins = new ArrayList<String>();
+            course.jsonPins = JSON.serialize(new ArrayList<Pin>());
             course.registeredUsers = new ArrayList<String>();
             if (!course.validate(course.toDoc())) {
                 System.out.println("not valid!");
@@ -53,7 +53,7 @@ public class Course extends Model<Course> {
     public boolean validate(Document doc) {
         return (doc.containsKey("courseName")
                 && doc.containsKey("registeredUsers")
-                && doc.containsKey("pins"));
+                && doc.containsKey("jsonPins"));
     }
 
     @Override
@@ -66,12 +66,11 @@ public class Course extends Model<Course> {
         Document doc = new Document();
         doc.append("courseName", this.courseName);
         doc.append("registeredUsers", this.registeredUsers);
-        doc.append("pins", this.packPins());
+        doc.append("jsonPins", this.jsonPins);
         return doc;
     }
-
-    private String packPins() {
-        return JSON.serialize(this.pins);
+    public Document toClientDoc() {
+        return this.toDoc();
     }
 
     @Override
@@ -86,9 +85,9 @@ public class Course extends Model<Course> {
 //            this.pins = (courseDoc.containsKey("pins")
 //                    ? courseDoc.get("pins", ArrayList.class)
 //                    : new ArrayList<Pin>());
-            this.pins = (courseDoc.containsKey("pins")
-                    ? (ArrayList<String>) JSON.parse(courseDoc.getString("pins"))
-                    : new ArrayList<String>());
+            this.jsonPins = (courseDoc.containsKey("jsonPins")
+                    ? JSON.serialize(courseDoc.get("jsonPins", ArrayList.class))
+                    : JSON.serialize(new ArrayList<Pin>()));
             return this;
         }
     }
@@ -130,6 +129,13 @@ public class Course extends Model<Course> {
         }
     }
 
+    public void addPin(Pin pin) throws DatabaseException {
+        ArrayList<Pin> pinsArray = (ArrayList<Pin>) JSON.parse(this.jsonPins);
+        pinsArray.add(pin);
+        this.jsonPins = JSON.serialize(pinsArray);
+        this.save();
+    }
+
     public ArrayList getRegisteredUsers() {
         return this.registeredUsers;
     }
@@ -143,7 +149,7 @@ public class Course extends Model<Course> {
     }
 
     //public ArrayList<Pin> getPins() {
-    public ArrayList<String> getPins() {
-        return this.pins;
+    public ArrayList<Pin> getPins() {
+        return (ArrayList<Pin>) JSON.parse(this.jsonPins);
     }
 }

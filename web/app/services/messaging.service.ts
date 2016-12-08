@@ -25,7 +25,8 @@ export class MessagingService {
       this.http.request(new Request(requestOpts))
         .subscribe((res) => {
           let json = JSON.parse(res.json());
-          if (json.res === 1)
+          console.log('json[res]: ', json['res']);
+          if (json['res'] === 1)
             resolve(json);
           else
             reject(json)

@@ -25,7 +25,7 @@ public class Courses {
             res.err(e);
         }
         if (course != null) {
-            res.append("course", course.toDoc());
+            res.append("course", course.toClientDoc());
             res.end(true);
         }
         else {
@@ -36,7 +36,7 @@ public class Courses {
 
     public Handler createCourse = (req, res) -> {
         Course course = new Course().fromDoc(req.data);
-        if (course.validate(course.toDoc())) {
+        if (course.validate(course.toClientDoc())) {
             try {
                 course.save();
             } catch (DatabaseException exc) {

@@ -4,6 +4,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from "@angular/router";
 
 import { UserService } from './services/user.service';
+import {User} from "./user";
 
 
 @Component({
@@ -49,20 +50,21 @@ export class LoginComponent implements OnInit {
     private router: Router,
     private userService: UserService) { }
 
-  login() {
+  login(): Promise<User> {
     this.loading = true;
-    this.userService.login(this.model.username, this.model.password)
+    return this.userService.login(this.model.username, this.model.password)
       .then(
         user => {
           console.log('success!');
-          this.router.navigate(['/dashboard'])
+          this.router.navigate(['/dashboard']);
+          return user;
         },
         err => {
           this.incorrectPassword = true;
           this.loading = false;
+          return err;
         }
       );
-    return false;
   }
 
   ngOnInit(): void {

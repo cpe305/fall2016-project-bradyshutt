@@ -101,6 +101,11 @@ public class Router {
                 new String[]{"jwt"},
                 new Middleware[]{middlewares.userFromJwt});
 
+        this.register("getUserCourses",
+                users.getUserCourses,
+                new String[]{"jwt"},
+                new Middleware[]{middlewares.userFromJwt});
+
         this.register("usernameIsAvailable",
                 users.usernameIsAvailable,
                 new String[]{"username"});
@@ -137,6 +142,11 @@ public class Router {
         this.register("createCourse",
                 courses.createCourse,
                 new String[]{"courseName"});
+
+        this.register("userAddPinToBoard",
+                users.userAddPinToBoard,
+                new String[]{"courseName", "pinContent", "jwt"},
+                new Middleware[]{middlewares.userFromJwt});
 
         this.register("getCourse",
                 courses.getCourse,
