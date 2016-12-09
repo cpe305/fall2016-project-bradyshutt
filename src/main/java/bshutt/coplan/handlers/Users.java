@@ -68,6 +68,9 @@ public class Users {
 //    };
 
     public Handler getUserCourses = (req, res) -> {
+        ArrayList<Course> courses = req.user.getCourses();
+        ArrayList<Document> courseDocs = new ArrayList<>();
+        courses.forEach((course) -> courseDocs.add(course.toClientDoc()));
         res.append("courses", req.user.getCourses());
         res.end(true);
     };
@@ -83,7 +86,6 @@ public class Users {
         }
         Document pinDoc = req.getData("pin", Document.class);
         Pin pin = Pin.fromDoc(pinDoc);
-        System.out.println("pin: "+ pin.toString());
 
         try {
             course.addPin(pin);

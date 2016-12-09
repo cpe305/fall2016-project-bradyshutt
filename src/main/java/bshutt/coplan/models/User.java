@@ -112,7 +112,6 @@ public class User extends Model<User> {
     @Override
     public Document toDBDoc() {
         ArrayList<Document> coursesList = new ArrayList<>();
-        System.out.println("this.courses: " + this.getCourses());
 //        for (Course course : this.getCourses()) {
 //            coursesList.add(course.toDBDoc());
 //
@@ -242,7 +241,6 @@ public class User extends Model<User> {
             throw new CourseRegistrationException("The course '" + course.courseName + "' does not exist!");
         this.courses.add(course);
         //Course.load(courseName).registerUser(this.username);
-        System.out.println("--->" + this.toString());
         this.save();
     }
 

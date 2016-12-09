@@ -1,6 +1,7 @@
 package bshutt.coplan.handlers;
 
 import bshutt.coplan.*;
+import bshutt.coplan.models.Course;
 import bshutt.coplan.models.Pin;
 import bshutt.coplan.utils.RequestBuilder;
 import com.mongodb.util.JSON;
@@ -364,11 +365,19 @@ public class UsersTest {
                     .addData("jwt", jwt)
                     .done()).getDoc();
             assertEquals(SUCCESS, getUserCourses.get("res"));
-            ArrayList<String> courses = getUserCourses.get("courses", ArrayList.class);
+            ArrayList<Document> courseDocs = getUserCourses.get("courses", ArrayList.class);
+            ArrayList<Course> courses = new ArrayList<>();
+            courseDocs.forEach((courseDoc) -> {
+
+                System.out.println("\n\n" + courseDoc + "\n\n" );
+                courses.add(new Course().fromDoc(courseDoc));
+            });
             final boolean[] hasCPE101_A = {false};
             final boolean[] hasPHIL331_A = {false};
+            System.out.println("\n\n" + courses.toString() + "\n\n" );
             courses.forEach((course) -> {
-                String courseName = course;
+                System.out.println("\n\n" + course.getCourseName() + "\n\n" );
+                String courseName = course.getCourseName();
                 if (courseName.equals("PHIL-331")) {
                     hasPHIL331_A[0] = true;
                 } else if (courseName.equals("CPE-101")) {

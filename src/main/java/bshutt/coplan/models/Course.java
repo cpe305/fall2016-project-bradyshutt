@@ -75,7 +75,6 @@ public class Course extends Model<Course> {
         ArrayList<Document> pinDocs = new ArrayList<>();
         this.pins.forEach((pin) -> pinDocs.add(pin.toDoc()));
         doc.append("pins", pinDocs);
-        System.out.println("cname: " + this.courseName);
         return doc;
     }
     public Document toClientDoc() {
