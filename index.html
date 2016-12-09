@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="Fall2016-project-bradyshutt : fall2016-project-bradyshutt created by GitHub Classroom">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Fall2016-project-bradyshutt</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/cpe305/fall2016-project-bradyshutt">View on GitHub</a>
+
+          <h1 id="project_title">Fall2016-project-bradyshutt</h1>
+          <h2 id="project_tagline">fall2016-project-bradyshutt created by GitHub Classroom</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/cpe305/fall2016-project-bradyshutt/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/cpe305/fall2016-project-bradyshutt/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a id="coplan" class="anchor" href="#coplan" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Coplan</h1>
+
+<p>Brady Shutt's project for CPE-305</p>
+
+<h1>
+<a id="coplan-1" class="anchor" href="#coplan-1" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Coplan</h1>
+
+<p><a href="http://coplan.bshutt.com/">coplan.bshutt.com</a></p>
+
+<p><a href="https://travis-ci.org/cpe305/fall2016-project-bradyshutt"><img src="https://travis-ci.org/cpe305/fall2016-project-bradyshutt.svg?branch=master" alt="Build Status"></a></p>
+
+<p><em>Coplan: The College Planner</em></p>
+
+<p>Manage important due dates, deadlines, and test days with Coplan!</p>
+
+<h2>
+<a id="project-structure" class="anchor" href="#project-structure" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Project Structure</h2>
+
+<p>The way in which this project behaves is a little strange, 
+so some explanation is necesarry.</p>
+
+<p>The core business logic of this project is written in Java. 
+The application works by letting the JVM endlessly run the 
+exported .jar file. The .jar then, indefinitely listens to 
+it's STDIN in a blocking fashion. Upon receiving input, which
+must be preformmated JSON, the running Java application will 
+handle the 'request', and eventually return a response by 
+writing a JSON message to STDOUT.</p>
+
+<p>A Node.js application is also running. Node.js acts as the
+HTTP server that clients interract with. Upon receiving a 
+HTTP request, node will, if necesarry, talk to the running 
+JVM via STDIN/STDOUT to fulfill requests.</p>
+
+<p>The Node.js process is essentially acting as the bridge
+between the client and the business logic.</p>
+
+<h2>
+<a id="commands" class="anchor" href="#commands" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Commands</h2>
+
+<p>The Java program handles all the business logic associated with
+Coplan, by communicating with a Node.js process via JSON-formatted
+commands sent through STDIN/STDOUT.</p>
+
+<p>Commands are to be formatted in the following way:</p>
+
+<ul>
+<li>There are two essentail components: 'route', and 'data'</li>
+<li>'route' specifies the endpoint you want to talk you</li>
+<li>'data' specifies an object with keys and values pertinant to the endpoint</li>
+<li>If you attempt to access an endpoint without the needed requirements, an error message will be returned</li>
+</ul>
+
+<h2>
+<a id="request-example" class="anchor" href="#request-example" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Request Example</h2>
+
+<p>{ 
+   route: "createUser", 
+   data: {
+      username: "bshutt",
+      firstName: "Brady",
+      lastName: "Shutt",
+      major: "Computer Science"
+   }
+}</p>
+
+<h2>
+<a id="class-diagram" class="anchor" href="#class-diagram" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Class Diagram</h2>
+
+<p><img src="/coplanDiagram.png" alt="Class Diagram"></p>
+
+<h2>
+<a id="picture-of-application" class="anchor" href="#picture-of-application" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Picture of Application</h2>
+
+<p><img src="/currentState.png" alt="Application Picture"></p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Fall2016-project-bradyshutt maintained by <a href="https://github.com/cpe305">cpe305</a></p>
+        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
