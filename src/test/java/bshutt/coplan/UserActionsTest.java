@@ -32,10 +32,10 @@ public class UserActionsTest {
 //
 //    Document user = db.getDocument("users", "username", "bshutt");
 //    assertNotNull(user);
-//    assertEquals("bshutt", (String) user.get("username"));
-//    assertEquals("Brady", (String) user.get("firstName"));
-//    assertEquals("Shutt", (String) user.get("lastName"));
-//    assertNotNull((String) user.get("passwordHash"));
+//    assertEquals("bshutt", (String) user.getData("username"));
+//    assertEquals("Brady", (String) user.getData("firstName"));
+//    assertEquals("Shutt", (String) user.getData("lastName"));
+//    assertNotNull((String) user.getData("passwordHash"));
 //  }
 //
 //  @Test

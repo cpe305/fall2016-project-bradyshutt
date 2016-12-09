@@ -2,6 +2,7 @@ package bshutt.coplan;
 
 import bshutt.coplan.exceptions.JwtException;
 import bshutt.coplan.exceptions.UserDoesNotExistException;
+import bshutt.coplan.models.Course;
 import bshutt.coplan.models.User;
 import org.bson.Document;
 
@@ -9,9 +10,10 @@ import static org.bson.Document.parse;
 
 public class Request {
 
-    public String route;
-    public Document data;
-    public User user;
+    public String route = null;
+    public Document data = null;
+    public User user = null;
+    public Course course = null;
 
     public Request() { }
 
@@ -26,40 +28,36 @@ public class Request {
         this.data = (Document) reqDoc.get("data");
     }
 
-    public String get(String key) {
+    public String getData(String key) {
         return this.data.getString(key);
     }
 
-    public <T> T get(String key, Class<T> type) {
+    public <T> T getData(String key, Class<T> type) {
         return this.data.get(key, type);
     }
 
-    public User getUser() throws UserDoesNotExistException, JwtException {
-        String username = this.get("username");
-        String jwt = this.get("jwt");
-        if (username != null) {
-            try {
-                this.user = User.load(username);
-            } catch (UserDoesNotExistException uDNE) {
+//    public User getUser() throws UserDoesNotExistException, JwtException {
+//        String username = this.getData("username");
+//        String jwt = this.getData("jwt");
+//        if (username != null) {
+//            this.user = User.load(username);
+//        } else if (jwt != null) {
+//            this.user = this.getUserFromJwt(jwt);
+//        } else {
+//            this.user = null;
+//        }
+//        return this.user;
+//    }
 
-            }
-        } else if (jwt != null) {
-            this.user = this.getUserFromJwt(jwt);
-        } else {
-            this.user = null;
-        }
-        return this.user;
-    }
-
-    public User getUserFromJwt(String jwt) throws UserDoesNotExistException, JwtException {
-        if (jwt == null) {
-            return null;
-        } else {
-            this.user = User.loadFromJwt(jwt);
-            return this.user;
-        }
-
-    }
+//    public User getUserFromJwt(String jwt) throws UserDoesNotExistException, JwtException {
+//        if (jwt == null) {
+//            return null;
+//        } else {
+//            this.user = User.loadFromJwt(jwt);
+//            return this.user;
+//        }
+//
+//    }
 
     public boolean contains(String key) {
         return (this.data.containsKey(key));

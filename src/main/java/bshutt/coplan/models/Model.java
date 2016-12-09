@@ -2,14 +2,9 @@ package bshutt.coplan.models;
 
 import bshutt.coplan.Database;
 import bshutt.coplan.exceptions.DatabaseException;
-import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
-import org.bson.codecs.configuration.CodecRegistries;
-import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.conversions.Bson;
-
-import java.util.Collection;
 
 public abstract class Model<Type> {
 
@@ -36,12 +31,12 @@ public abstract class Model<Type> {
         return doc;
     }
 
-//    public String get(String key) {
+//    public String getData(String key) {
 //        return this.attributes.getString(key);
 //    }
 
-//    public <T> T get(String key, Class<T> type) {
-//        return this.attributes.get(key, type);
+//    public <T> T getData(String key, Class<T> type) {
+//        return this.attributes.getData(key, type);
 //    }
 
 //    public void set(String key, Object value) {
@@ -56,13 +51,13 @@ public abstract class Model<Type> {
 //    }
 
     public void save() throws DatabaseException {
-        Document doc = this.toDoc();
+        Document doc = this.toDBDoc();
         if (this.validate(doc)) {
             if (this.existsInDB()) {
                 try {
                     this.col.findOneAndReplace(this.filter, doc);
                 } catch (Exception exc) {
-                    throw new DatabaseException("Error with 'findOneAndReplace'", exc);
+                    throw new DatabaseException("Error with 'findOneAndReplace': " + exc.getMessage(), exc);
                 }
             } else {
                 this.col.insertOne(doc);
@@ -86,7 +81,7 @@ public abstract class Model<Type> {
     //public abstract Type load(String filterVal) throws Exception;
     public abstract boolean validate(Document doc);
     public abstract String getFilterValue();
-    public abstract Document toDoc();
+    public abstract Document toDBDoc();
     public abstract Type fromDoc(Document doc);
 
 }

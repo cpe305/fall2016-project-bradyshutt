@@ -1,11 +1,16 @@
 package bshutt.coplan.handlers;
 
 import bshutt.coplan.*;
+import bshutt.coplan.models.Pin;
 import bshutt.coplan.utils.RequestBuilder;
+import com.mongodb.util.JSON;
 import org.bson.Document;
 import org.junit.Before;
 import org.junit.Test;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 
@@ -13,6 +18,8 @@ public class UsersTest {
 
     private JsonReaderStrategy jrs;
     private Router router;
+    private int FAILURE = 0;
+    private int SUCCESS = 1;
 
     @Before
     public void setup() {
@@ -29,7 +36,7 @@ public class UsersTest {
                     .addData("username", "rswan")
                     .end();
             Document getResponseDoc = router.route(getReq).getDoc();
-            assertEquals(1, getResponseDoc.get("res"));
+            assertEquals(SUCCESS, getResponseDoc.get("res"));
             Document userDoc = getResponseDoc.get("user", Document.class);
 
             assertEquals("rswan", userDoc.get("username"));
@@ -45,7 +52,7 @@ public class UsersTest {
                 .addData("username", "jon_snow")
                 .done();
         Document resDoc = router.route(req).getDoc();
-        assertEquals(0, resDoc.get("res"));
+        assertEquals(FAILURE, resDoc.get("res"));
     }
 
     @Test
@@ -56,16 +63,15 @@ public class UsersTest {
                 .addData("password", "winter_is_coming")
                 .done();
         Document resDoc = router.route(req).getDoc();
-        assertEquals(0, resDoc.get("res"));
+        assertEquals(FAILURE, resDoc.get("res"));
     }
 
     @Test
     public void testCreateUser() {
         this.testUser("jsnow", "123", (user, doc) -> {
-            assertEquals(1, doc.get("res"));
+            assertEquals(SUCCESS, doc.get("res"));
         });
     }
-
 
     @Test
     public void testCreateUserFailure() {
@@ -79,14 +85,14 @@ public class UsersTest {
                     .end();
 
             Document response = router.route(req).getDoc();
-            assertEquals(0, response.get("res"));
+            assertEquals(FAILURE, response.get("res"));
 
             Request deleteReq = new RequestBuilder()
                     .setRoute("removeUser")
                     .addData("username", "_test_bshutt2")
                     .end();
             Document deleteResponse = router.route(deleteReq).getDoc();
-            assertEquals(1, deleteResponse.get("res"));
+            assertEquals(SUCCESS, deleteResponse.get("res"));
         });
     }
 
@@ -100,7 +106,7 @@ public class UsersTest {
                     .end();
 
             Document loginRes = router.route(loginReq).getDoc();
-            assertEquals(1, loginRes.get("res"));
+            assertEquals(SUCCESS, loginRes.get("res"));
             assertNotNull(loginRes.getString("jwt"));
         });
     }
@@ -114,7 +120,7 @@ public class UsersTest {
                     .addData("password", "abc")
                     .end();
             Document loginRes = router.route(loginReq).getDoc();
-            assertEquals(0, loginRes.get("res"));
+            assertEquals(FAILURE, loginRes.get("res"));
         });
     }
 
@@ -128,7 +134,7 @@ public class UsersTest {
                     .end();
 
             Document loginRes = router.route(loginReq).getDoc();
-            assertEquals(1, loginRes.get("res"));
+            assertEquals(SUCCESS, loginRes.get("res"));
             String jwt = loginRes.getString("jwt");
             assertNotNull(jwt);
 
@@ -138,7 +144,7 @@ public class UsersTest {
                     .end();
 
             Document jwtLoginRes = router.route(jwtLoginReq).getDoc();
-            assertEquals(1, jwtLoginRes.get("res"));
+            assertEquals(SUCCESS, jwtLoginRes.get("res"));
 
         });
     }
@@ -155,14 +161,14 @@ public class UsersTest {
                     .done();
 
             Document registerRes = router.route(registerReq).getDoc();
-            assertEquals(1, registerRes.get("res"));
+            assertEquals(SUCCESS, registerRes.get("res"));
 
             Request courseReq = new RequestBuilder()
                     .setRoute("getCourse")
                     .addData("courseName", "_test_CPE-123")
                     .done();
             Document courseRes = router.route(courseReq).getDoc();
-            assertEquals(1, courseRes.get("res"));
+            assertEquals(SUCCESS, courseRes.get("res"));
             Document courseDoc = courseRes.get("course", Document.class);
             ArrayList<String> users = courseDoc.get("registeredUsers", ArrayList.class);
 
@@ -183,10 +189,10 @@ public class UsersTest {
                     .addData("courseName", "_test_CPE-123")
                     .done();
             Document registerRes = router.route(registerReq).getDoc();
-            assertEquals(1, registerRes.get("res"));
+            assertEquals(SUCCESS, registerRes.get("res"));
 
             Document registerAgainRes = router.route(registerReq).getDoc();
-            assertEquals(0, registerAgainRes.get("res"));
+            assertEquals(FAILURE, registerAgainRes.get("res"));
             this.deleteCourses(new String[]{"_test_CPE-123"}    );
         });
     }
@@ -203,7 +209,7 @@ public class UsersTest {
                             .addData("jwt", oldJwt)
                             .end())
                     .getDoc();
-            assertEquals(1, jwtLoginRes.get("res"));
+            assertEquals(SUCCESS, jwtLoginRes.get("res"));
 
             Document reqNewJwtResponse = router.route(
                     new RequestBuilder()
@@ -212,7 +218,7 @@ public class UsersTest {
                             .done())
                     .getDoc();
             String newJwt = reqNewJwtResponse.getString("jwt");
-            assertEquals(1, reqNewJwtResponse.get("res"));
+            assertEquals(SUCCESS, reqNewJwtResponse.get("res"));
 
             assertEquals(oldJwt, newJwt);
 
@@ -221,14 +227,14 @@ public class UsersTest {
                     .addData("jwt", oldJwt)
                     .end();
             Document oldJwtResponse = router.route(tryOldJwt).getDoc();
-            assertEquals(1, oldJwtResponse.get("res"));
+            assertEquals(SUCCESS, oldJwtResponse.get("res"));
 
             Request tryNewJwt = new RequestBuilder()
                     .setRoute("checkJwt")
                     .addData("jwt", newJwt)
                     .end();
             Document newJwtResponse = router.route(tryNewJwt).getDoc();
-            assertEquals(1, newJwtResponse.get("res"));
+            assertEquals(SUCCESS, newJwtResponse.get("res"));
         });
     }
 
@@ -242,7 +248,7 @@ public class UsersTest {
                     .addData("jwt", jwt)
                     .done();
             Document detailsResponse = router.route(detailsRequest).getDoc();
-            assertEquals(1, detailsResponse.get("res"));
+            assertEquals(SUCCESS, detailsResponse.get("res"));
         });
     }
 
@@ -250,14 +256,63 @@ public class UsersTest {
     public void testGetUserDetailsWithJwtFailure() {
         this.testUser((user, doc) -> {
             String jwt = doc.getString("jwt");
-
             Request detailsRequest = new RequestBuilder()
                     .setRoute("getUserDetails")
                     .addData("jwt", jwt + "123") // --> wrong jwt
                     .done();
-            Document detailsResponse = router.route(detailsRequest).getDoc();
-            assertEquals(0, detailsResponse.get("res"));
+            Response res  = router.route(detailsRequest);
+            Document detailsResponse = res.getDoc();
+            assertEquals(FAILURE, detailsResponse.get("res"));
         });
+    }
+
+    @Test
+    public void testGetUserDetailsWithJwtFailure2() {
+        String[] jwt = new String[]{null};
+
+        this.testUser((user, doc) -> {
+            jwt[0] = doc.getString("jwt");
+        });
+
+        Document res = router.route(new RequestBuilder()
+                .setRoute("getUserDetails")
+                .addData("jwt", jwt[0]) // --> wrong jwt
+                .done()).getDoc();
+
+        assertEquals(FAILURE, res.get("res"));
+    }
+
+
+    @Test
+    public void testGetUserDetailsWithJwtFailure3() {
+        String[] jwt = new String[]{null};
+
+        this.testUser((user, doc) -> {
+            jwt[0] = doc.getString("jwt");
+        });
+
+        Document res = router.route(new RequestBuilder()
+                .setRoute("getUserDetails")
+                .addData("jwt", "123" + jwt[0] + "123") // --> wrong jwt
+                .done()).getDoc();
+
+        assertEquals(FAILURE, res.get("res"));
+    }
+
+    @Test
+    public void testGetUserDetailsWithJwtNull() {
+        String[] jwt = new String[]{null};
+
+        this.testUser((user, doc) -> {
+            jwt[0] = doc.getString("jwt");
+        });
+
+        Document res = router.route(new RequestBuilder()
+                .setRoute("getUserDetails")
+                .addData("jwt", null) // --> wrong jwt
+                .done()).getDoc();
+
+        assertEquals(FAILURE, res.get("res"));
     }
 
     @Test
@@ -288,32 +343,32 @@ public class UsersTest {
                     .setRoute("getUserDetails")
                     .addData("jwt", jwt)
                     .done()).getDoc();
-            assertEquals(1, login.get("res"));
+            assertEquals(SUCCESS, login.get("res"));
 
             Document registerForCourse = router.route(new RequestBuilder()
                     .setRoute("registerForCourse")
                     .addData("jwt", jwt)
                     .addData("courseName", "CPE-101")
                     .done()).getDoc();
-            assertEquals(1, registerForCourse.get("res"));
+            assertEquals(SUCCESS, registerForCourse.get("res"));
 
             Document registerForAnotherCourse = router.route(new RequestBuilder()
                     .setRoute("registerForCourse")
                     .addData("jwt", jwt)
                     .addData("courseName", "PHIL-331")
                     .done()).getDoc();
-            assertEquals(1, registerForAnotherCourse.get("res"));
+            assertEquals(SUCCESS, registerForAnotherCourse.get("res"));
 
             Document getUserCourses = router.route(new RequestBuilder()
                     .setRoute("getUserCourses")
                     .addData("jwt", jwt)
                     .done()).getDoc();
-            assertEquals(1, getUserCourses.get("res"));
-            ArrayList<Document> courses = getUserCourses.get("courses", ArrayList.class);
+            assertEquals(SUCCESS, getUserCourses.get("res"));
+            ArrayList<String> courses = getUserCourses.get("courses", ArrayList.class);
             final boolean[] hasCPE101_A = {false};
             final boolean[] hasPHIL331_A = {false};
             courses.forEach((course) -> {
-                String courseName = course.getString("courseName");
+                String courseName = course;
                 if (courseName.equals("PHIL-331")) {
                     hasPHIL331_A[0] = true;
                 } else if (courseName.equals("CPE-101")) {
@@ -328,13 +383,13 @@ public class UsersTest {
                     .addData("jwt", jwt)
                     .addData("courseName", "PHIL-331")
                     .done()).getDoc();
-            assertEquals(1, unregisterForCourse.get("res"));
+            assertEquals(SUCCESS, unregisterForCourse.get("res"));
 
             Document getUserCourses_B = router.route(new RequestBuilder()
                     .setRoute("getUserCourses")
                     .addData("jwt", jwt)
                     .done()).getDoc();
-            assertEquals(1, getUserCourses_B.get("res"));
+            assertEquals(SUCCESS, getUserCourses_B.get("res"));
             ArrayList<Document> courses_B = getUserCourses_B.get("courses", ArrayList.class);
             final boolean[] hasCPE101_B = {false};
             final boolean[] hasPHIL331_B = {false};
@@ -354,13 +409,13 @@ public class UsersTest {
                     .addData("jwt", jwt)
                     .addData("courseName", "CPE-101")
                     .done()).getDoc();
-            assertEquals(1, unregisterForAnotherCourse.get("res"));
+            assertEquals(SUCCESS, unregisterForAnotherCourse.get("res"));
 
             Document getUserCourses_C = router.route(new RequestBuilder()
                     .setRoute("getUserCourses")
                     .addData("jwt", jwt)
                     .done()).getDoc();
-            assertEquals(1, getUserCourses_C.get("res"));
+            assertEquals(SUCCESS, getUserCourses_C.get("res"));
             ArrayList<Document> courses_C = getUserCourses_C.get("courses", ArrayList.class);
             final boolean[] hasCPE101_C = {false};
             final boolean[] hasPHIL331_C = {false};
@@ -378,6 +433,48 @@ public class UsersTest {
     }
 
     @Test
+    public void testUserAddPinToBoard() {
+        this.testUser((user, doc) -> {
+            this.testCourse((course) -> {
+                String courseName = course.getString("courseName");
+                String jwt = doc.getString("jwt");
+
+                Document registerForCourse = router.route(new RequestBuilder()
+                        .setRoute("registerForCourse")
+                        .addData("courseName", courseName)
+                        .addData("jwt", jwt)
+                        .done()).getDoc();
+                assertEquals(SUCCESS, registerForCourse.get("res"));
+
+                Document pin = new Document()
+                        .append("pinName", "myFirstPin!")
+                        .append("createDate", new Date().toString())
+                        .append("deadline", null)
+                        .append("content", "This in my first pin. It's short, but sweet. :-)");
+
+                Document addPin = router.route(new RequestBuilder()
+                        .setRoute("addPinToBoard")
+                        .addData("jwt", jwt)
+                        .addData("courseName", courseName)
+                        .addData("pin", pin)//JSON.serialize(pin))
+                        .done()).getDoc();
+                assertEquals(SUCCESS, addPin.get("res"));
+
+                //Document user = addPin.getData("user", Document.class);
+                Document updatedCourse = addPin.get("course", Document.class);
+
+                ArrayList<Document> coursePinDocs = updatedCourse.get("pins", ArrayList.class);
+                ArrayList<Pin> coursePins = new ArrayList<>();
+                coursePinDocs.forEach((pinDoc) -> coursePins.add(Pin.fromDoc(pinDoc)));
+
+                assertFalse(coursePins.isEmpty());
+                assertTrue(coursePins.get(0).getName().equals("myFirstPin!"));
+
+            });
+        });
+    }
+
+    @Test
     public void testTestUser() {
 
         this.testUser((user, doc) -> {
@@ -389,7 +486,7 @@ public class UsersTest {
                     .addData("username", "rswan")
                     .end();
             Document getUserResponse = router.route(getUserRequest).getDoc();
-            assertEquals(1, getUserResponse.get("res"));
+            assertEquals(SUCCESS, getUserResponse.get("res"));
             assertEquals("rswan", getUserResponse.get("user", Document.class).getString("username"));
         });
 
@@ -399,7 +496,7 @@ public class UsersTest {
                 .addData("username", "rswan")
                 .end();
         Document getUserResponse = router.route(getUserRequest).getDoc();
-        assertEquals(0, getUserResponse.get("res"));
+        assertEquals(FAILURE, getUserResponse.get("res"));
 
     }
 
@@ -433,6 +530,24 @@ public class UsersTest {
                     .end();
             router.route(deleteReq);
         }
+    }
+
+    private void testCourse(DoWithTempCourse actions) {
+        String courseName = "CSC-000";
+        Document createCourse = router.route(new RequestBuilder()
+                .setRoute("createCourse")
+                .addData("courseName", courseName)
+                .done()).getDoc();
+
+        Document course = createCourse.get("course", Document.class);
+        try {
+            actions.Do(course);
+        } catch (Throwable t) {
+            System.out.println("--- uncaught '"+t.toString()+"' exception ---");
+            throw t;
+        }
+
+        this.deleteCourses(new String[]{"CSC-000"});
     }
 
     private void testUser(DoWithTempUser actions) {
@@ -485,5 +600,9 @@ public class UsersTest {
 
 interface DoWithTempUser {
     void Do(Document user, Document createUserRes);
+}
+
+interface DoWithTempCourse {
+    void Do(Document course);
 }
 

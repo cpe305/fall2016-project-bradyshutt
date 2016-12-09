@@ -54,6 +54,7 @@ public class Router {
                 .end(false);
             return res;
         }
+
         try {
             transaction.init(req);
         } catch (HandlerMissingArgumentsException hmae) {
@@ -99,12 +100,12 @@ public class Router {
         this.register("getUserDetails",
                 users.getUserDetails,
                 new String[]{"jwt"},
-                new Middleware[]{middlewares.userFromJwt});
+                new Middleware[]{middlewares.loadUserJwt});
 
         this.register("getUserCourses",
                 users.getUserCourses,
                 new String[]{"jwt"},
-                new Middleware[]{middlewares.userFromJwt});
+                new Middleware[]{middlewares.loadUserJwt});
 
         this.register("usernameIsAvailable",
                 users.usernameIsAvailable,
@@ -129,12 +130,12 @@ public class Router {
         this.register("registerForCourse",
                 users.registerForCourse,
                 new String[]{"courseName", "jwt"},
-                new Middleware[]{middlewares.userFromJwt});
+                new Middleware[]{middlewares.loadUserJwt});
 
         this.register("unregisterForCourse",
                 users.unregisterForCourse,
                 new String[]{"courseName", "jwt"},
-                new Middleware[]{middlewares.userFromJwt});
+                new Middleware[]{middlewares.loadUserJwt});
 
         this.register("getAllUsers",
                 users.getAllUsers);
@@ -143,10 +144,10 @@ public class Router {
                 courses.createCourse,
                 new String[]{"courseName"});
 
-        this.register("userAddPinToBoard",
-                users.userAddPinToBoard,
-                new String[]{"courseName", "pinContent", "jwt"},
-                new Middleware[]{middlewares.userFromJwt});
+        this.register("addPinToBoard",
+                users.addPinToBoard,
+                new String[]{"courseName", "pin", "jwt"},
+                new Middleware[]{middlewares.loadUserJwt});
 
         this.register("getCourse",
                 courses.getCourse,
@@ -162,7 +163,7 @@ public class Router {
         this.register("refreshJwt",
                 users.refreshJwt,
                 new String[]{"jwt"},
-                new Middleware[]{middlewares.userFromJwt});
+                new Middleware[]{middlewares.loadUserJwt});
 
     }
 }
@@ -215,10 +216,14 @@ class Transaction {
     public boolean init(Request req) throws HandlerMissingArgumentsException {
         this.response = new Response(req);
         this.request = req;
-        if (this.args == null || req.data.keySet().containsAll(this.args)) {
-            return true;
-        } else
+        if ((this.args == null) || (req.data.keySet().containsAll(this.args))) {
+            if (req.data.containsValue(null))
+                throw new HandlerMissingArgumentsException("contains null arg");
+            else
+                return true;
+        } else {
             throw new HandlerMissingArgumentsException();
+        }
     }
 }
 

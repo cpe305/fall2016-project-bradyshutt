@@ -2,25 +2,14 @@ package bshutt.coplan.models;
 
 import com.auth0.jwt.JWTSigner;
 import com.auth0.jwt.JWTVerifier;
-import com.auth0.jwt.JWTVerifyException;
-import com.mongodb.MongoClient;
-import org.bson.BsonArray;
-import org.bson.BsonValue;
-import org.bson.Document;
-import org.bson.types.ObjectId;
+import org.bson.*;
 import org.mindrot.jbcrypt.BCrypt;
 
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SignatureException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
-import bshutt.coplan.Database;
-import bshutt.coplan.models.Course;
 import bshutt.coplan.exceptions.*;
 
 public class User extends Model<User> {
@@ -30,37 +19,34 @@ public class User extends Model<User> {
     private static final String ISSUER = "http://coplan.bshutt.com/";
 
     private String username;
-    private ArrayList<String> courses;
+    private ArrayList<Course> courses;
     private String firstName;
     private String lastName;
     private String email;
     private String jwt;
     private String hashedPassword;
 
+
     public User() {
         super(collectionName, filterKey);
     }
 
-    public String getUsername() {
-        return this.username;
-    }
-    public String getFirstName() {
-        return this.firstName;
-    }
-    public String getLastName() {
-        return this.lastName;
-    }
-    public String getEmail() {
-        return this.email;
-    }
-    public String getHashedPassword() {
-        return this.hashedPassword;
-    }
 
-    public String getJwt() throws DatabaseException {
-        if (this.jwt == null) {
-            this.giveJwt();
-        }
+    public ArrayList<Course> getCourses() { return this.courses; }
+    public String getEmail() { return this.email; }
+    public String getFirstName() { return this.firstName; }
+    public String getHashedPassword() { return this.hashedPassword; }
+    public String getLastName() { return this.lastName; }
+    public String getUsername() { return this.username; }
+    public void setCourses(ArrayList<Course> courses) { this.courses = courses; }
+    public void setEmail(String email) { this.email = email; }
+    public void setFirstName(String firstName) { this.firstName = firstName; }
+    public void setHashedPassword(String hashedPassword) { this.hashedPassword = hashedPassword; }
+    public void setJwt(String jwt) { this.jwt = jwt; }
+    public void setLastName(String lastName) { this.lastName = lastName; }
+    public void setUsername(String username) { this.username = username; }
+
+    public String getJwt() {
         return this.jwt;
     }
 
@@ -93,7 +79,7 @@ public class User extends Model<User> {
         this.email = userDoc.getString("email");
         this.courses = userDoc.get("courses", ArrayList.class);
         if (this.courses == null)
-            this.courses = new ArrayList<String>();
+            this.courses = new ArrayList<Course>();
         if (userDoc.containsKey("hashedPassword")) {
             this.hashedPassword = userDoc.getString("hashedPassword");
         } else if (userDoc.containsKey("password")) {
@@ -124,60 +110,64 @@ public class User extends Model<User> {
     }
 
     @Override
-    public Document toDoc() {
-        String jwt;
-        try {
-            jwt = this.getJwt();
-        } catch (DatabaseException e) {
-            jwt = null;
-        }
+    public Document toDBDoc() {
+        ArrayList<Document> coursesList = new ArrayList<>();
+        System.out.println("this.courses: " + this.getCourses());
+//        for (Course course : this.getCourses()) {
+//            coursesList.add(course.toDBDoc());
+//
+//        }
+//        this.courses.forEach((course) -> {
+//        });
         Document doc = new Document("username", this.username)
                 .append("firstName", this.firstName)
                 .append("lastName", this.lastName)
-                .append("courses", this.courses)
+                .append("courses", coursesList)
                 .append("hashedPassword", this.hashedPassword)
                 .append("email", this.email)
-                .append("jwt", jwt);
+                .append("jwt", this.jwt);
         return doc;
     }
 
     public Document toClientDoc() {
+        ArrayList<Document> coursesList = new ArrayList<>();
+        this.courses.forEach((course) -> coursesList.add(course.toDBDoc()));
         Document doc = new Document("username", this.username)
                 .append("firstName", this.firstName)
                 .append("lastName", this.lastName)
-                .append("courses", this.courses)
+                .append("courses", coursesList)
                 .append("email", this.email);
         return doc;
     }
 
-    public Document toClientDoc(boolean includeCourseDetails) {
-        Document doc = new Document("username", this.username)
-                .append("firstName", this.firstName)
-                .append("lastName", this.lastName)
-                .append("email", this.email);
-        if (includeCourseDetails) {
-            try {
-                doc.append("courses", this.getCourseDetails().get("courses"));
-            } catch (DatabaseException | CourseValidationException exc) {
-                doc.append("courses", null);
-            }
-        } else {
-            doc.append("courses", this.courses);
-        }
-        return doc;
-    }
+//    public Document toClientDoc() {
+//        Document doc = new Document("username", this.username)
+//                .append("firstName", this.firstName)
+//                .append("lastName", this.lastName)
+//                .append("email", this.email);
+//        if (includeCourseDetails) {
+//            try {
+//                this.replaceCourseNamesWithDetails(doc);
+//                doc.append("courses", .getData("courses"));
+//            } catch (DatabaseException | CourseValidationException exc) {
+//                doc.append("courses", null);
+//            }
+//        } else {
+//            doc.append("courses", this.courses);
+//        }
+//        return doc;
+//    }
 
-    public Document getCourseDetails() throws DatabaseException, CourseValidationException {
-        ArrayList courses = new ArrayList();
-        for (String courseName : this.courses) {
-            Course course = Course.load(courseName);
-            Document courseDoc = course.toClientDoc();
-            courses.add(courseDoc);
-        }
-        Document doc = new Document();
-        doc.append("courses", courses);
-        return doc;
-    }
+//    public Document replaceCourseNamesWithDetails() throws DatabaseException, CourseValidationException {
+//        for (String courseName : this.courses) {
+//            Course course = Course.load(courseName);
+//            Document courseDoc = course.toClientDoc();
+//            courses.add(courseDoc);
+//        }
+//        Document doc = new Document();
+//        doc.append("courses", courses);
+//        return doc;
+//    }
 
     public Document replaceNamesWithDetails(Document doc) throws DatabaseException, CourseValidationException {
         ArrayList<Document> courses = new ArrayList<Document>();
@@ -247,11 +237,12 @@ public class User extends Model<User> {
         }
     }
 
-    public void registerForCourse(String courseName) throws CourseRegistrationException, DatabaseException {
-        if (!Course.exists(courseName))
-            throw new CourseRegistrationException("The course '" + courseName + "' does not exist!");
-        this.courses.add(courseName);
+    public void registerForCourse(Course course) throws CourseRegistrationException, DatabaseException, CourseValidationException {
+        if (!Course.exists(course.courseName))
+            throw new CourseRegistrationException("The course '" + course.courseName + "' does not exist!");
+        this.courses.add(course);
         //Course.load(courseName).registerUser(this.username);
+        System.out.println("--->" + this.toString());
         this.save();
     }
 
@@ -260,12 +251,9 @@ public class User extends Model<User> {
         this.save();
     }
 
-    public ArrayList getCourses() {
-        return this.courses;
+    public String toString() {
+        return "<"+this.username+"> "+ this.toDBDoc().toJson();
     }
 
-    public String toString() {
-        return "<"+this.username+"> "+ this.toDoc().toJson();
-    }
 }
 

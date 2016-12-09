@@ -2,15 +2,21 @@ package bshutt.coplan;
 
 import bshutt.coplan.exceptions.DatabaseException;
 import com.mongodb.MongoClient;
+import com.mongodb.MongoClientOptions;
+import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.IndexOptions;
 import org.bson.Document;
+import org.bson.codecs.configuration.CodecRegistries;
+import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.conversions.Bson;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 
 public class Database {
 
@@ -23,12 +29,25 @@ public class Database {
     public MongoDatabase db;
 
     private Database() {
+//        CodecRegistry codecRegistry = CodecRegistries.fromRegistries(
+//                CodecRegistries.fromCodecs(new UserCodec(MongoClient.getDefaultCodecRegistry())),
+//                CodecRegistries.fromProviders(
+//                        new UserCodecProvider()),
+//                MongoClient.getDefaultCodecRegistry());
+
+//        MongoClientOptions options = MongoClientOptions.builder()
+//                .codecRegistry(codecRegistry).build();
+        ServerAddress address = new ServerAddress(Database.url, Database.port);
+        this.setLogs();
+        this.client = new MongoClient(address);
+        this.db = this.client.getDatabase(Database.dbName);
+        this.setIndexes();
+    }
+
+    private void setLogs() {
         System.setProperty("DEBUG.MONGO", "true");
         Logger mongoLogger = Logger.getLogger("org.mongodb.driver");
         mongoLogger.setLevel(Level.SEVERE);
-        this.client = new MongoClient(Database.url, Database.port);
-        this.db = this.client.getDatabase(Database.dbName);
-        this.setIndexes();
     }
 
     public static Database getInstance() {

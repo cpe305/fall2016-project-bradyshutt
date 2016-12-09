@@ -5,6 +5,9 @@ import org.bson.Document;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import bshutt.coplan.Request;
+import org.bson.codecs.DocumentCodec;
+import org.bson.codecs.DocumentCodecProvider;
+import org.bson.codecs.configuration.CodecRegistries;
 
 public class Response {
 
@@ -57,8 +60,7 @@ public class Response {
         this.doc = new Document();
         this.doc.append("res", 0);
         this.doc.append("route", this.request.route);
-        this.doc.append("errMessage", exc.getMessage());
-        this.doc.append("exceptionCause", exc.getCause().toString());
+        addException(this.doc, exc);
         this.end();
         return this;
     }
@@ -67,7 +69,7 @@ public class Response {
         this.doc = new Document();
         this.doc.append("res", 0);
         this.doc.append("route", this.request.route);
-        this.doc.append("errMessage", errMsg);
+        this.doc.append("message", errMsg);
         this.doc.append("request", this.request.pack());
         this.end();
         return this;
@@ -75,10 +77,11 @@ public class Response {
 
     public Response err(String errMsg, Exception exc) {
         this.doc = new Document();
+
         this.doc.append("res", 0);
+        this.doc.append("message", errMsg);
+        addException(this.doc, exc);
         this.doc.append("route", this.request.route);
-        this.doc.append("errMessage", errMsg);
-        this.doc.append("stackTrace", exc.getMessage());
         this.doc.append("request", this.request.pack());
         this.end();
         return this;
@@ -142,8 +145,23 @@ public class Response {
             return this;
         }
     }
+
     public Document getDoc() {
         return this.doc;
     }
+
+    private void addException(Document doc, Exception exc) {
+        final StringWriter sw = new StringWriter();
+        final PrintWriter pw = new PrintWriter(sw, true);
+        Document exceptionDoc = new Document();
+        exceptionDoc.append("toString", exc.toString());
+        exceptionDoc.append("message", exc.getMessage());
+        exc.printStackTrace(pw);
+        String stackTrace = sw.getBuffer().toString();
+        exceptionDoc.append("stackTrace", stackTrace);
+        doc.append("exception", stackTrace);
+    }
+
+
 
 }

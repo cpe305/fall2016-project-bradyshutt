@@ -1,9 +1,9 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 import { UserService } from './services/user.service';
 import { User } from './user';
 import { Subscription } from 'rxjs/Subscription';
-import {Router} from "@angular/router";
+import { Router } from "@angular/router";
 
 
 @Component({
@@ -28,6 +28,7 @@ import {Router} from "@angular/router";
       background-color: #333;
       height: 65px;
     }
+    
     h1 {
       float: left;
       height: 65px;
@@ -35,6 +36,7 @@ import {Router} from "@angular/router";
       line-height: 65px;
       display: inline-block;
     }
+    
     ul.navBar {
       display: inline-block;
       float: left;
@@ -51,7 +53,8 @@ import {Router} from "@angular/router";
       border-right: 1px solid #595959;
     }
     
-    ul li:hover {
+    ul a:hover {
+      curson: pointer;
       background-color: #444;
     }
     
@@ -71,6 +74,7 @@ import {Router} from "@angular/router";
     }
   `]
 })
+
 export class AppComponent implements OnInit {
   user: User = null;
   subscription: Subscription;
@@ -111,8 +115,9 @@ export class AppComponent implements OnInit {
         .catch((reject) => {
           console.log('oops');
           console.log('rejected: ', reject);
-
+          let arr = [1, 2,3]
         });
+
     }
   }
 

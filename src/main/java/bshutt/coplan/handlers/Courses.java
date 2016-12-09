@@ -15,7 +15,7 @@ public class Courses {
     private Database db = Database.getInstance();
 
     public Handler getCourse = (req, res) -> {
-        String courseName = req.get("courseName");
+        String courseName = req.getData("courseName");
         Course course = null;
         try {
             course = Course.load(courseName);
@@ -44,6 +44,7 @@ public class Courses {
                 return;
             }
             res.append("createdCourse", "success");
+            res.append("course", course.toClientDoc());
             res.end(true);
         } else {
             res.err("invalid params for creating new course");
@@ -52,7 +53,7 @@ public class Courses {
     };
 
     public Handler deleteCourse = (req, res) -> {
-        String courseName = req.get("courseName");
+        String courseName = req.getData("courseName");
         try {
             this.db.col("courses").findOneAndDelete(this.db.filter("courseName", courseName));
         } catch (DatabaseException exc) {

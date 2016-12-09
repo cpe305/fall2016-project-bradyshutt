@@ -55,7 +55,6 @@ export class LoginComponent implements OnInit {
     return this.userService.login(this.model.username, this.model.password)
       .then(
         user => {
-          console.log('success!');
           this.router.navigate(['/dashboard']);
           return user;
         },

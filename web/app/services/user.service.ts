@@ -30,6 +30,12 @@ export class UserService {
   }
 
   currentUser(): User {
+    let u = localStorage.getItem('user')
+    console.log( 'lS.getItem("user") = ',
+      u
+    );
+    let uu = JSON.parse(u)
+    console.log(uu);
     let userData = JSON.parse(localStorage.getItem('user')) || null;
     if (!userData) return null;
     let user = new User(userData);
@@ -74,8 +80,7 @@ export class UserService {
         return Promise.resolve(user);
       },
       invalid => {
-        console.log('res', invalid);
-        console.log('username/pass incorrect');
+        return Promise.reject("Invalid login credentials");
       });
   }
 
@@ -125,7 +130,8 @@ export class UserService {
     console.log('pre-msg:', message);
     return this.messagingService.sendMessage(message).then(
       response => {
-        let course: Course = new Course(response.course);
+        console.log('res123', response);
+        let course: Course = new Course(response.user);
         let updatedUser: User = new User(response.user);
         this.userChanged.next({change: 'newCourse', user: updatedUser});
         return Promise.resolve(course);
@@ -137,7 +143,7 @@ export class UserService {
   addPinToCourse(newPin: any, courseName: string): Promise<Course> {
     let user = this.currentUser();
     let message = {
-      route: 'registerForCourse',
+      route: 'addPinToBoard',
       data: {
         username: user.username,
         jwt: JSON.parse(localStorage.getItem("jwt")),

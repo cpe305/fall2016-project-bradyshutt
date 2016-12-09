@@ -12,7 +12,7 @@ import { Dashboard } from './dashboard.component';
 import { LoginComponent } from './login.component';
 import { MainContent } from './main-content.component';
 import { MessagingService } from  './services/messaging.service';
-import { SideBar } from './side-bar.component';
+//import { SideBar } from './side-bar.component';
 import { SignUpComponent } from './signup.component';
 import { UserService } from './services/user.service';
 
@@ -47,7 +47,7 @@ import { UserService } from './services/user.service';
   ],
   declarations: [
     AppComponent,
-    SideBar,
+    //SideBar,
     MainContent,
     Dashboard,
     CurrentUser,
