@@ -1,43 +1,28 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en-us">
   <head>
-    <meta charset='utf-8'>
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <meta name="description" content="Fall2016-project-bradyshutt : fall2016-project-bradyshutt created by GitHub Classroom">
-
-    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
-
-    <title>Fall2016-project-bradyshutt</title>
+    <meta charset="UTF-8">
+    <title>Fall2016-project-bradyshutt by cpe305</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
   </head>
-
   <body>
+    <section class="page-header">
+      <h1 class="project-name">Fall2016-project-bradyshutt</h1>
+      <h2 class="project-tagline">fall2016-project-bradyshutt created by GitHub Classroom</h2>
+      <a href="https://github.com/cpe305/fall2016-project-bradyshutt" class="btn">View on GitHub</a>
+      <a href="https://github.com/cpe305/fall2016-project-bradyshutt/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/cpe305/fall2016-project-bradyshutt/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
 
-    <!-- HEADER -->
-    <div id="header_wrap" class="outer">
-        <header class="inner">
-          <a id="forkme_banner" href="https://github.com/cpe305/fall2016-project-bradyshutt">View on GitHub</a>
-
-          <h1 id="project_title">Fall2016-project-bradyshutt</h1>
-          <h2 id="project_tagline">fall2016-project-bradyshutt created by GitHub Classroom</h2>
-
-            <section id="downloads">
-              <a class="zip_download_link" href="https://github.com/cpe305/fall2016-project-bradyshutt/zipball/master">Download this project as a .zip file</a>
-              <a class="tar_download_link" href="https://github.com/cpe305/fall2016-project-bradyshutt/tarball/master">Download this project as a tar.gz file</a>
-            </section>
-        </header>
-    </div>
-
-    <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer">
-      <section id="main_content" class="inner">
-        <h1>
+    <section class="main-content">
+      <h1>
 <a id="coplan" class="anchor" href="#coplan" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Coplan</h1>
 
 <p>Brady Shutt's project for CPE-305</p>
-
-<h1>
-<a id="coplan-1" class="anchor" href="#coplan-1" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Coplan</h1>
 
 <p><a href="http://coplan.bshutt.com/">coplan.bshutt.com</a></p>
 
@@ -51,23 +36,52 @@
 <a id="project-structure" class="anchor" href="#project-structure" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Project Structure</h2>
 
 <p>The way in which this project behaves is a little strange, 
-so some explanation is necesarry.</p>
+so some explanation is necessary.</p>
 
 <p>The core business logic of this project is written in Java. 
-The application works by letting the JVM endlessly run the 
+The application works by letting the JVM continuously run the 
 exported .jar file. The .jar then, indefinitely listens to 
-it's STDIN in a blocking fashion. Upon receiving input, which
-must be preformmated JSON, the running Java application will 
-handle the 'request', and eventually return a response by 
+it's STDIN in a blocking fashion [on purpose; That way the JVM
+isn't going crazy in an endless loop]. Upon receiving input, which
+must be pre-formatted JSON, the running Java application will 
+handle the request, and eventually return a response by 
 writing a JSON message to STDOUT.</p>
 
-<p>A Node.js application is also running. Node.js acts as the
-HTTP server that clients interract with. Upon receiving a 
-HTTP request, node will, if necesarry, talk to the running 
-JVM via STDIN/STDOUT to fulfill requests.</p>
+<p>A Node.js application is also running. Node.js acts as a
+bridge pattern between the Java process and the client. Node.js
+actually starts and manages the Java JAR. Upon receiving
+an HTTP request, node forwards the request to the JVM. </p>
 
 <p>The Node.js process is essentially acting as the bridge
 between the client and the business logic.</p>
+
+<h2>
+<a id="patterns-used" class="anchor" href="#patterns-used" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Patterns Used</h2>
+
+<p>I used many GOF design patterns in my project. Some of the more
+prevalent ones were the singleton pattern, interpreter pattern,
+and strategy pattern. </p>
+
+<p>The Singleton pattern is used to manage the database instance,
+so it doesn't create multiple instances to the same database
+object.</p>
+
+<p>The Interpreter pattern is used to interpret requests, and
+then respond to them.</p>
+
+<p>The Strategy pattern goes hand-in-hand with the Interpreter pattern
+in this case. I have two strategies for interpreting commands. They 
+are a JSON-formatted strategy, and a CLI-formatted strategy.</p>
+
+<h2>
+<a id="class-diagram" class="anchor" href="#class-diagram" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Class Diagram</h2>
+
+<p><img src="http://users.csc.calpoly.edu/%7Ebshutt/305/cpe305FinalProj.png" alt="Class Diagram"></p>
+
+<h2>
+<a id="picture-of-application" class="anchor" href="#picture-of-application" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Picture of Application</h2>
+
+<p><img src="/currentState.png" alt="Application Picture"></p>
 
 <h2>
 <a id="commands" class="anchor" href="#commands" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Commands</h2>
@@ -88,7 +102,7 @@ commands sent through STDIN/STDOUT.</p>
 <h2>
 <a id="request-example" class="anchor" href="#request-example" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Request Example</h2>
 
-<p>{ 
+<pre><code>{ 
    route: "createUser", 
    data: {
       username: "bshutt",
@@ -96,29 +110,17 @@ commands sent through STDIN/STDOUT.</p>
       lastName: "Shutt",
       major: "Computer Science"
    }
-}</p>
+}
+</code></pre>
 
-<h2>
-<a id="class-diagram" class="anchor" href="#class-diagram" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Class Diagram</h2>
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/cpe305/fall2016-project-bradyshutt">Fall2016-project-bradyshutt</a> is maintained by <a href="https://github.com/cpe305">cpe305</a>.</span>
 
-<p><img src="/classDiagram.png" alt="Class Diagram"></p>
-
-<h2>
-<a id="picture-of-application" class="anchor" href="#picture-of-application" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Picture of Application</h2>
-
-<p><img src="currentState.png" alt="Application Picture"></p>
-      </section>
-    </div>
-
-    <!-- FOOTER  -->
-    <div id="footer_wrap" class="outer">
-      <footer class="inner">
-        <p class="copyright">Fall2016-project-bradyshutt maintained by <a href="https://github.com/cpe305">cpe305</a></p>
-        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
       </footer>
-    </div>
 
-    
+    </section>
 
+  
   </body>
 </html>
