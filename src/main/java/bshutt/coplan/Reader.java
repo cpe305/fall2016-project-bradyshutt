@@ -5,7 +5,6 @@ import java.io.InputStreamReader;
 
 public class Reader {
 
-    private InputStreamReader isr;
     private BufferedReader bufferReader;
     private ReaderStrategy readerStrategy;
     private boolean continueReading = true;
@@ -13,7 +12,7 @@ public class Reader {
     public Reader(ReaderStrategy readerStrategy) {
         this.readerStrategy = readerStrategy;
 
-        isr = new InputStreamReader(System.in);
+        InputStreamReader isr = new InputStreamReader(System.in);
         bufferReader = new BufferedReader(isr);
     }
 

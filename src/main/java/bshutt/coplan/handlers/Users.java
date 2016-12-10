@@ -26,11 +26,9 @@ public class Users {
             } else {
                 res.append("user", user.toClientDoc());
                 res.end(true);
-                return;
             }
         } catch (Exception exc) {
             res.err("Error loading user: " + exc.getMessage(), exc);
-            return;
         }
     };
 
@@ -70,7 +68,6 @@ public class Users {
             res.end(true);
         } else {
             res.err("Invalid data params for creating a user");
-            return;
         }
     };
 
@@ -175,11 +172,6 @@ public class Users {
 
     public Handler registerForCourse = (req, res) -> {
         User user = req.user;
-        System.out.println("USER COURES: {");
-        req.user.courses.forEach(course -> {
-            System.out.println("course: " + course);
-        });
-        System.out.println("}");
         Course course = null;
         try {
             course = Course.load(req.getData("courseName"));
@@ -202,9 +194,6 @@ public class Users {
             return;
         }
 
-
-        course.printDetails();
-
         try {
             user.registerForCourse(course);
         } catch (CourseRegistrationException | CourseValidationException | DatabaseException exc) {
@@ -212,19 +201,9 @@ public class Users {
             return;
         }
 
-        Document usr = user.serialize();
-        System.out.println("## usr reg end" + usr.toJson());
-
-        try {
-            System.out.println("## loaded usr reg end" + User.load(user.username).serialize());
-        } catch (UserDoesNotExistException e) {
-            e.printStackTrace();
-        }
-
         res.append("message", "User '" + user.username
                 + "' registered for course + '"
                 + req.getData("courseName") + "'.");
-        //res.append("course", course.toClientDoc(true));
         res.append("user", user.toClientDoc());
         res.end(true);
     };
@@ -257,7 +236,7 @@ public class Users {
     };
 
     public Handler getAllUsers = (req, res) -> {
-        ArrayList<String> users = new ArrayList<String>();
+        ArrayList<String> users = new ArrayList<>();
         try {
             db.col("users").find().forEach((Block<Document>)
                     (doc) -> users.add(doc.getString("username")));
@@ -296,54 +275,3 @@ public class Users {
         }
     };
 }
-
-//    public Document getUser(String username) {
-//        Document userDoc = null;
-//        try {
-//            userDoc = this.db
-//                    .col("users")
-//                    .find(db.filter("username", username))
-//                    .first();
-//        } catch (DBException exc) {
-//            res.err(exc, res);
-//        }
-//        return userDoc;
-//    }
-
-//    public void createUser(Document user) {
-//        try {
-//            this.db.col("users").insertOne(user);
-//        } catch (DBException exc) {
-//            res.
-//            e.printStackTrace();
-//        }
-//    }
-
-
-//        String jwt = null; //        try {
-//            jwt = req.user.getJwt();
-//        } catch (DatabaseException e) {
-//            res.err("DB error with getting the JWT", e);
-//        }
-//        boolean jwtIsValid = false;
-//        try {
-//            jwtIsValid = User.validateJwt(jwt);
-//        } catch (JwtException e) {
-//            res.err("Jwt error", e);
-//            return;
-//        }
-//
-//        if (!jwtIsValid) {
-//            res.append("errorMessage", "JWT not validated.");
-//            res.end(false);
-//        }
-//
-//        res.append("message", "JWT validated successfully.");
-//        try {
-//            res.append("courses", req.user.getCourseDetails());
-//        } catch (DatabaseException | CourseValidationException exc) {
-//            res.err("Error getting course details", exc);
-//            return;
-//        }
-//    };
-

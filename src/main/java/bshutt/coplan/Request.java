@@ -1,7 +1,5 @@
 package bshutt.coplan;
 
-import bshutt.coplan.exceptions.JwtException;
-import bshutt.coplan.exceptions.UserDoesNotExistException;
 import bshutt.coplan.models.Course;
 import bshutt.coplan.models.User;
 import org.bson.Document;
@@ -35,29 +33,6 @@ public class Request {
     public <T> T getData(String key, Class<T> type) {
         return this.data.get(key, type);
     }
-
-//    public User getUser() throws UserDoesNotExistException, JwtException {
-//        String username = this.getData("username");
-//        String jwt = this.getData("jwt");
-//        if (username != null) {
-//            this.user = User.load(username);
-//        } else if (jwt != null) {
-//            this.user = this.getUserFromJwt(jwt);
-//        } else {
-//            this.user = null;
-//        }
-//        return this.user;
-//    }
-
-//    public User getUserFromJwt(String jwt) throws UserDoesNotExistException, JwtException {
-//        if (jwt == null) {
-//            return null;
-//        } else {
-//            this.user = User.loadFromJwt(jwt);
-//            return this.user;
-//        }
-//
-//    }
 
     public boolean contains(String key) {
         return (this.data.containsKey(key));

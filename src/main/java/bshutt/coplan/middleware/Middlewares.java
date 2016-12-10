@@ -1,7 +1,6 @@
 package bshutt.coplan.middleware;
 
 import bshutt.coplan.exceptions.*;
-import bshutt.coplan.models.Course;
 import bshutt.coplan.models.User;
 
 public class Middlewares {
@@ -23,27 +22,4 @@ public class Middlewares {
             throw new MiddlewareException("Couldn't getData user from that JWT", null);
         }
     };
-
-    public Middleware loadUsersCourses = (req, res) -> {
-
-    };
-
-//    public Middleware loadCourse = (req, res) -> {
-//        String courseName = req.getData("courseName");
-//        if (courseName == null) {
-//            res.err("Error getting course from request: Missing courseName in request.");
-//            return;
-//        } else {
-//            try {
-//                req.course = Course.load(courseName);
-//            } catch (CourseValidationException | DatabaseException e) {
-//                throw new MiddlewareException("Middleware error loading course", e);
-//            }
-//        }
-//
-//        if (req.user == null) {
-//            throw new MiddlewareException("Couldn't getData user from that JWT", null);
-//        }
-//    };
-
 }

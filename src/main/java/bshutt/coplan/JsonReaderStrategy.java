@@ -4,18 +4,6 @@ import org.bson.Document;
 
 public class JsonReaderStrategy implements ReaderStrategy {
 
-    /*
-    format:
-        {
-        route: <route>,
-        data: {
-            <doc>
-         }
-        }
-
-
-     */
-
     @Override
     public Request interpret(String cmdString) {
         Document inputDoc = Document.parse(cmdString);

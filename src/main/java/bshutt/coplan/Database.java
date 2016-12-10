@@ -29,14 +29,6 @@ public class Database {
     public MongoDatabase db;
 
     private Database() {
-//        CodecRegistry codecRegistry = CodecRegistries.fromRegistries(
-//                CodecRegistries.fromCodecs(new UserCodec(MongoClient.getDefaultCodecRegistry())),
-//                CodecRegistries.fromProviders(
-//                        new UserCodecProvider()),
-//                MongoClient.getDefaultCodecRegistry());
-
-//        MongoClientOptions options = MongoClientOptions.builder()
-//                .codecRegistry(codecRegistry).build();
         ServerAddress address = new ServerAddress(Database.url, Database.port);
         this.setLogs();
         this.client = new MongoClient(address);
@@ -60,7 +52,7 @@ public class Database {
         return this;
     }
 
-    public void setIndexes() {
+    private void setIndexes() {
         this.db.getCollection("users").createIndex(
                 new Document("username", 1),
                 new IndexOptions().unique(true));

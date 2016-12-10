@@ -8,18 +8,10 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class Pin implements Serializable {
-    private String name;
-    private String content;
-    private Date createDate;
-    private Date deadline;
-
-    public String getName() { return name; }
-
-    public String getContent() { return content; }
-
-    public Date getCreateDate() { return createDate; }
-
-    public Date getDeadline() { return deadline; }
+    public String name;
+    public String content;
+    public Date createDate;
+    public Date deadline;
 
 
 
@@ -78,7 +70,7 @@ public class Pin implements Serializable {
     }
 
     public String toString() {
-        return "Pin: { " + this.getName() + ", " + this.getContent() + " }";
+        return "Pin: { " + this.name + ", " + this.content + " }";
     }
 
     public Document serialize() {
@@ -95,18 +87,24 @@ public class Pin implements Serializable {
 
     public static ArrayList<Pin> toPinList(ArrayList<Document> docs) {
         ArrayList<Pin> pins = new ArrayList<>();
-        docs.forEach((doc) -> {
-            Pin pin = Pin.fromDoc(doc);
-            pins.add(pin);
-        });
-        return pins;
+        if (docs != null) {
+            docs.forEach((doc) -> {
+                if (doc != null)
+                    pins.add(Pin.fromDoc(doc));
+            });
+            return pins;
+        } else {
+           return null;
+        }
     }
 
     public static ArrayList<Document> toDocList(ArrayList<Pin> pins) {
         ArrayList<Document> docs = new ArrayList<>();
-        pins.forEach((pin) -> {
-            docs.add(pin.serialize());
-        });
+        if (pins != null) {
+            pins.forEach((pin) -> {
+                docs.add(pin.serialize());
+            });
+        }
         return docs;
     }
 }

@@ -49,7 +49,6 @@ public class Courses {
             res.end(true);
         } else {
             res.err("invalid params for creating new course");
-            return;
         }
     };
 
@@ -65,7 +64,7 @@ public class Courses {
     };
 
     public Handler getAllCourses = (req, res) -> {
-        ArrayList<String> courses = new ArrayList<String>();
+        ArrayList<String> courses = new ArrayList<>();
         try {
             db.col("courses").find().forEach((Block<Document>)
                     (doc) -> courses.add(doc.getString("courseName")));

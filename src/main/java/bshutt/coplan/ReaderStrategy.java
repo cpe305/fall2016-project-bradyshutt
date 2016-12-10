@@ -1,6 +1,5 @@
 package bshutt.coplan;
 
-public interface ReaderStrategy {
-
+interface ReaderStrategy {
     Request interpret(String cmdString);
 }

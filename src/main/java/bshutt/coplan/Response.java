@@ -87,21 +87,6 @@ public class Response {
         return this;
     }
 
-//    public Response err(Exception exc) {
-//        this.doc = new Document();
-//        this.doc.append("res", 0);
-//        this.doc.append("exception", exc.toString());
-//        this.doc.append("req", this.request.pack());
-//        StringWriter sw = new StringWriter();
-//        PrintWriter pw = new PrintWriter(sw);
-//        exc.printStackTrace(pw);
-//        String stackTrace = sw.toString();
-//        this.doc.append("stackTrace", stackTrace);
-//        this.doc.append("request", this.request.pack());
-//        this.end();
-//        return this;
-//    }
-
     public Response end() {
         if (this.isDone) {
             throw new Error("This response has already finished. You can't end it again.");
@@ -111,17 +96,6 @@ public class Response {
             return this;
         }
     }
-
-//    public Response end(String msg) {
-//        this.doc.append("message", msg);
-//        if (this.isDone) {
-//            throw new Error("This response has already finished. You can't end it again.");
-//        } else {
-//            System.out.println(doc.toJson());
-//            this.isDone = true;
-//            return this;
-//        }
-//    }
 
     public Response end(Boolean status) {
         this.doc.append("res", status? 1 : 0);

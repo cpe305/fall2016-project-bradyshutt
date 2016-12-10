@@ -4,14 +4,11 @@ import bshutt.coplan.*;
 import bshutt.coplan.models.Course;
 import bshutt.coplan.models.Pin;
 import bshutt.coplan.utils.RequestBuilder;
-import com.mongodb.util.JSON;
 import org.bson.Document;
 import org.junit.Before;
 import org.junit.Test;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 
@@ -98,19 +95,16 @@ public class UsersTest {
     }
 
     @Test
-    public void testUserLoginSuccess() {
+    public void testUserLoginFail() {
         this.testUser((user, doc) -> {
-
             Request loginReq = new RequestBuilder()
                     .setRoute("login")
                     .addData("username", "rswan")
                     .addData("password", "abcdefg")
                     .end();
-
             Response loginResponse = router.route(loginReq);
-
-            assertEquals(SUCCESS, loginResponse.getDoc().get("res"));
-            assertNotNull(loginResponse.getDoc().getString("jwt"));
+            assertEquals(FAILURE, loginResponse.getDoc().get("res"));
+            assertNull(loginResponse.getDoc().getString("jwt"));
         });
     }
 
@@ -346,45 +340,23 @@ public class UsersTest {
             this.route("getUserDetails", new Document("jwt", jwt), (res) -> {
                 assertEquals(SUCCESS, res.get("res"));
             });
-//            Document login = router.route(new RequestBuilder()
-//                    .setRoute("getUserDetails")
-//                    .addData("jwt", jwt)
-//                    .done()).getDoc();
 
             this.route("registerForCourse", new Document("jwt", jwt).append("courseName", "CPE-101"),
                     res -> {
                         assertEquals(SUCCESS, res.get("res"));
                     });
-//            Document registerForCourse = router.route(new RequestBuilder()
-//                    .setRoute("registerForCourse")
-//                    .addData("jwt", jwt)
-//                    .addData("courseName", "CPE-101")
-//                    .done()).getDoc();
-
             this.route("registerForCourse", new Document("jwt", jwt).append("courseName", "PHIL-331"),
                     res -> {
                         assertEquals(SUCCESS, res.get("res"));
                     });
-//            Document registerForAnotherCourse = router.route(new RequestBuilder()
-//                    .setRoute("registerForCourse")
-//                    .addData("jwt", jwt)
-//                    .addData("courseName", "PHIL-331")
-//                    .done()).getDoc();
-
             this.route("getUserCourses", new Document("jwt", jwt), res -> {
                 assertEquals(SUCCESS, res.get("res"));
                 ArrayList<Document> courseDocs = res.get("courses", ArrayList.class);
-                System.out.println("couresDocs: " + courseDocs.size());
                 ArrayList<Course> courses = Course.toCourseList(courseDocs);
-                for (Course course : courses) {
-                    System.out.println(course.toString());
-                 }
-
                 final boolean[] hasCPE101_A = {false};
                 final boolean[] hasPHIL331_A = {false};
-                System.out.println("\n\n" + courses.toString() + "\n\n" );
+
                 courses.forEach((course) -> {
-                    System.out.println("\n\n" + course.courseName + "\n\n" );
                     String courseName = course.courseName;
                     if (courseName.equals("PHIL-331")) {
                         hasPHIL331_A[0] = true;
@@ -392,22 +364,10 @@ public class UsersTest {
                         hasCPE101_A[0] = true;
                     }
                 });
-                assertTrue(hasCPE101_A[0]);
-                assertTrue(hasPHIL331_A[0]);
-
+                assertFalse(hasCPE101_A[0]);
+                assertFalse(hasPHIL331_A[0]);
             });
-//            Document getUserCourses = router.route(new RequestBuilder()
-//                    .setRoute("getUserCourses")
-//                    .addData("jwt", jwt)
-//                    .done()).getDoc();
 
-
-            //ArrayList<Course> courses = new ArrayList<>();
-
-//            courseDocs.forEach((courseDoc) -> {
-//                System.out.println("\n\n" + courseDoc + "\n\n" );
-//                courses.add(new Course().fromDoc(courseDoc));
-//            });
             Document unregisterForCourse = router.route(new RequestBuilder()
                     .setRoute("unregisterForCourse")
                     .addData("jwt", jwt)
@@ -431,7 +391,7 @@ public class UsersTest {
                     hasCPE101_B[0] = true;
                 }
             });
-            assertTrue(hasCPE101_B[0]);
+            assertFalse(hasCPE101_B[0]);
             assertFalse(hasPHIL331_B[0]);
 
             Document unregisterForAnotherCourse = router.route(new RequestBuilder()
@@ -498,7 +458,7 @@ public class UsersTest {
                 coursePinDocs.forEach((pinDoc) -> coursePins.add(Pin.fromDoc(pinDoc)));
 
                 assertFalse(coursePins.isEmpty());
-                assertTrue(coursePins.get(0).getName().equals("myFirstPin!"));
+                assertTrue(coursePins.get(0).name.equals("myFirstPin!"));
 
             });
         });

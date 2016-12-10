@@ -13,7 +13,7 @@ public class Course extends Model<Course> {
     private static final String filterKey = "courseName";
 
     public String courseName;
-    public ArrayList<String> registeredUsers;
+    private ArrayList<String> registeredUsers;
     public ArrayList<Pin> pins;
 
 
@@ -22,18 +22,15 @@ public class Course extends Model<Course> {
     }
 
     public static Course load(String courseName) throws CourseValidationException, DatabaseException {
-        Course course = Course.loadOrCreateCourse(courseName);
-        System.out.println("Loaded course <" + course.courseName + "> successfully." + course.toString());
-        return course;
+        return Course.loadOrCreateCourse(courseName);
     }
 
-    public static Course createNewCourse(String courseName) throws CourseValidationException, DatabaseException {
+    private static Course createNewCourse(String courseName) throws CourseValidationException, DatabaseException {
         Course course = new Course();
         course.courseName = courseName;
         course.pins = new ArrayList<>();
         course.registeredUsers = new ArrayList<>();
         if (!course.validate(course.serialize())) {
-            System.out.println("not valid!");
             throw new CourseValidationException();
         }
         course.save();
@@ -41,7 +38,7 @@ public class Course extends Model<Course> {
 
     }
 
-    public static Course loadOrCreateCourse(String courseName) throws DatabaseException, CourseValidationException {
+    private static Course loadOrCreateCourse(String courseName) throws DatabaseException, CourseValidationException {
         Course course = new Course();
         Document rawDocument = course.loadModel(courseName);
         if (rawDocument == null) {
@@ -64,43 +61,14 @@ public class Course extends Model<Course> {
     }
 
 
-//    @Override
-//    public Document toDxBDoc() {
-//        Document doc = new Document();
-//        doc.append("courseName", this.courseName);
-//        doc.append("registeredUsers", this.registeredUsers);
-//        doc.append("pins", Pin.pinsToDocs(this.pins));
-//        return doc;
-//    }
 
     public Document toClientDoc() {
-        Document doc = this.serialize();
-        //filter some if necesarry
-        return doc;
+        return this.serialize();
     }
-
-//    @Override
-//    public Course fromDoc(Document courseDoc) {
-//        this.courseName = courseDoc.getString("courseName");
-//        if (this.courseName == null) {
-//            return null;
-//        } else {
-//            this.registeredUsers = (courseDoc.containsKey("registeredUsers")
-//                    ? courseDoc.get("registeredUsers", ArrayList.class)
-//                    : new ArrayList<String>());
-////            this.serializedPins = (courseDoc.containsKey("serializedPins")
-////                    ? courseDoc.getString("jsonPins")
-////                    : JSON.serialize(new ArrayList<Pin>()));
-//            this.pins = (courseDoc.containsKey("pins")
-//                    ? courseDoc.get("pins", ArrayList.class)
-//                    : new ArrayList<>());
-//            return this;
-//        }
-//    }
 
     public static boolean exists(String courseName) {
         Database db = Database.getInstance();
-        Document doc = null;
+        Document doc;
         try {
             doc = db
                     .col("courses")
@@ -113,14 +81,16 @@ public class Course extends Model<Course> {
     }
 
     public void registerUser(String username) throws CourseRegistrationException {
-        if (this.registeredUsers.contains(username)) {
-            throw new CourseRegistrationException("User '" + username + "' is already registered for'"+this.courseName+"'.");
-        }
-        this.registeredUsers.add(username);
-        try {
-            this.save();
-        } catch (DatabaseException e) {
-            throw new CourseRegistrationException("Error updating course.");
+        if (this.registeredUsers != null) {
+            if (this.registeredUsers.contains(username)) {
+                throw new CourseRegistrationException("User '" + username + "' is already registered for'"+this.courseName+"'.");
+            }
+            this.registeredUsers.add(username);
+            try {
+                this.save();
+            } catch (DatabaseException e) {
+                throw new CourseRegistrationException("Error updating course.");
+            }
         }
     }
 
@@ -141,26 +111,6 @@ public class Course extends Model<Course> {
         this.save();
     }
 
-    //public void updatePins(PinsUpdater pinsUpdater) throws PinParseException, PinSerializationException {
-//        String serializedPins = this.serializedPins;
-//        ArrayList<Pin> pins;
-//        try {
-//            pins = (ArrayList<Pin>) Document.parse(serializedPins);
-//        } catch (Exception exc) {
-//            throw new PinParseException("Error parsing pins");
-//        }
-     //   pinsUpdater.Do(this.pins);
-        //String newSerializedPins;
-//        try {
-//            newSerializedPins = JSON.serialize(pins);
-//        } catch (Exception exc) {
-//            throw new PinSerializationException("Error serializing pins");
-//        }
-//
-//        this.serializedPins = newSerializedPins;
-   // }
-
-
     public static ArrayList<Course> toCourseList(ArrayList<Document> documents) {
         ArrayList<Course> courses = new ArrayList<>();
         documents.forEach(document -> {
@@ -173,9 +123,8 @@ public class Course extends Model<Course> {
     public static ArrayList<Document> toDocList(ArrayList<Course> courses) {
         ArrayList<Document> documents = new ArrayList<>();
         courses.forEach(course -> {
-            course.printDetails();
-            Document doc = course.serialize();
-            documents.add(doc);
+            if (course != null)
+                documents.add(course.serialize());
         });
         return documents;
     }
@@ -202,7 +151,6 @@ public class Course extends Model<Course> {
     }
 
     public void printDetails() {
-
         final String[] usersString = {"\n"};
         this.registeredUsers.forEach(user -> usersString[0] +="\t\t\t'"+user+"'\n");
         usersString[0] +="\t\t";
@@ -214,7 +162,6 @@ public class Course extends Model<Course> {
         String s = "Details for Course <"+this.courseName+">: {\n" +
                 "\t\tregisteredUsers: [" + usersString[0] + "]\n" +
                 "\t\tpins: [" + pinsString[0] + "]\n";
-        System.out.println("\n\n"+s+"\n\n");
     }
 }
 
