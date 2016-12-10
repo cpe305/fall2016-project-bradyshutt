@@ -12,13 +12,13 @@ public class Middlewares {
             return;
         } else {
             try {
-                req.user = User.loadFromJwt(jwt);
+                req.setUser( User.loadFromJwt(jwt));
             } catch (UserDoesNotExistException | JwtException e) {
                 throw new MiddlewareException("Middleware error loading user", e);
             }
         }
 
-        if (req.user == null) {
+        if (req.getUser() == null) {
             throw new MiddlewareException("Couldn't getData user from that JWT", null);
         }
     };

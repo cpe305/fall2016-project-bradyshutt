@@ -43,7 +43,7 @@ public class Router {
     }
 
     public Response route(Request req) {
-        Transaction transaction = this.routes.get(req.route);
+        Transaction transaction = this.routes.get(req.getRoute());
 
         if (transaction == null) {
             Response res = new Response(req)
@@ -57,7 +57,7 @@ public class Router {
         } catch (HandlerMissingArgumentsException hmae) {
             Response res = new Response(req)
                     .append("errorMessage", "Missing required arguments for this handler. Required arguments for '" +
-                            req.route + "' are: " + transaction.args.toString())
+                            req.getRoute() + "' are: " + transaction.args.toString())
                     .append("request", req.toString())
                     .end(false);
             return res;
@@ -71,7 +71,7 @@ public class Router {
             return res;
         }
 
-        if (!transaction.response.isDone) {
+        if (!transaction.response.isDone()) {
             transaction.response.end();
         }
         return transaction.response;

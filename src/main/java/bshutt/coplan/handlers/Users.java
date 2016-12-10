@@ -33,13 +33,13 @@ public class Users {
     };
 
     public Handler getUserDetails = (req, res) -> {
-        res.append("user", req.user.toClientDoc());//.toClientDoc(true));
+        res.append("user", req.getUser().toClientDoc());//.toClientDoc(true));
         res.end(true);
     };
 
     public Handler createUser = (req, res) -> {
         User user = new User();
-        user.deserialize(req.data);
+        user.deserialize(req.getData());
         if (!User.isUsernameAvailable(user.username)) {
             res.append("message", "Username '"+user.username+"' is not available.");
             res.end(false);
@@ -72,7 +72,7 @@ public class Users {
     };
 
     public Handler getUserCourses = (req, res) -> {
-        ArrayList<Course> courses = req.user.courses;
+        ArrayList<Course> courses = req.getUser().courses;
         ArrayList<Document> courseDocs = Course.toDocList(courses);
         res.append("courses", courseDocs);
         res.end(true);
@@ -101,7 +101,7 @@ public class Users {
     };
 
     public Handler removeUser = (req, res) -> {
-        String username = req.data.getString("username");
+        String username = req.getData().getString("username");
         try {
             this.db.col("users").findOneAndDelete(this.db.filter("username", username));
             this.db.col("courses").deleteMany(this.db.filter("registeredUsers", username));
@@ -171,7 +171,7 @@ public class Users {
     };
 
     public Handler registerForCourse = (req, res) -> {
-        User user = req.user;
+        User user = req.getUser();
         Course course = null;
         try {
             course = Course.load(req.getData("courseName"));
@@ -210,7 +210,7 @@ public class Users {
 
     public Handler unregisterForCourse = (req, res) -> {
         User user = null;
-        user = req.user;
+        user = req.getUser();
 
         Course course = null;
         try {
@@ -261,13 +261,13 @@ public class Users {
         if (validated) {
             String newJwt = null;
             try {
-                newJwt = req.user.giveJwt();
+                newJwt = req.getUser().giveJwt();
             } catch (DatabaseException exc) {
                 res.err("There was a database error.", exc);
                 return;
             }
             res.append("jwt", newJwt);
-            res.append("user", req.user.serialize());
+            res.append("user", req.getUser().serialize());
             res.end(true);
         } else {
             res.append("errorMessage", "The the old JWT did not match.");

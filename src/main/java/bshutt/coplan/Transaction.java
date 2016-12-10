@@ -54,8 +54,8 @@ class Transaction {
     public boolean init(Request req) throws HandlerMissingArgumentsException {
         this.response = new Response(req);
         this.request = req;
-        if ((this.args == null) || (req.data.keySet().containsAll(this.args))) {
-            if (req.data.containsValue(null))
+        if ((this.args == null) || (req.getData().keySet().containsAll(this.args))) {
+            if (req.getData().containsValue(null))
                 throw new HandlerMissingArgumentsException("contains null arg");
             else
                 return true;

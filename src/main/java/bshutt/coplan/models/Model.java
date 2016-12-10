@@ -18,7 +18,7 @@ public abstract class Model<Type> {
     private Bson filter;
 
     public Model(String collectionName, String filterKey) {
-        this.col = this.db.db.getCollection(collectionName);
+        this.col = this.db.getDB().getCollection(collectionName);
         this.filterKey = filterKey;
     }
 

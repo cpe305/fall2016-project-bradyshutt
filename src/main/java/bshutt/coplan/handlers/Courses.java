@@ -36,7 +36,7 @@ public class Courses {
 
     public Handler createCourse = (req, res) -> {
         Course course = new Course();
-        course.deserialize(req.data);
+        course.deserialize(req.getData());
         if (course.validate(course.toClientDoc())) {
             try {
                 course.save();

@@ -14,7 +14,7 @@ public class RequestBuilderTest {
                 .addData("dataB", "valueB");
         Request req = reqBuilder.done();
 
-        assertEquals(req.route, reqBuilder.route);
-        assertEquals(req.data, reqBuilder.data);
+        assertEquals(req.getRoute(), reqBuilder.route);
+        assertEquals(req.getData(), reqBuilder.data);
     }
 }

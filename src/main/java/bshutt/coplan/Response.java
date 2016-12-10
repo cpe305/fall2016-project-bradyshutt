@@ -12,14 +12,23 @@ import org.bson.codecs.configuration.CodecRegistries;
 public class Response {
 
     private Document doc;
-    public boolean isDone = false;
+
+    public boolean isDone() {
+        return isDone;
+    }
+
+    public Request getRequest() {
+        return request;
+    }
+
+    private boolean isDone = false;
     private Request request;
 
     public Response(Request req) {
         this.request = req;
         this.doc = new Document();
         this.doc.append("res", 1);
-        this.doc.append("route", this.request.route);
+        this.doc.append("route", this.request.getRoute());
     }
 
     public Response append(String key, Object obj) {
@@ -42,7 +51,7 @@ public class Response {
     public Response setResponse(Document doc) {
         this.doc = new Document(null);
         this.doc.append("res", 1);
-        this.doc.append("route", this.request.route);
+        this.doc.append("route", this.request.getRoute());
         doc.forEach((key, val) -> this.doc.append(key, val));
         this.end();
         return this;
@@ -59,7 +68,7 @@ public class Response {
     public Response err(Exception exc) {
         this.doc = new Document();
         this.doc.append("res", 0);
-        this.doc.append("route", this.request.route);
+        this.doc.append("route", this.request.getRoute());
         addException(this.doc, exc);
         this.end();
         return this;
@@ -68,7 +77,7 @@ public class Response {
     public Response err(String errMsg) {
         this.doc = new Document();
         this.doc.append("res", 0);
-        this.doc.append("route", this.request.route);
+        this.doc.append("route", this.request.getRoute());
         this.doc.append("message", errMsg);
         this.doc.append("request", this.request.pack());
         this.end();
@@ -81,7 +90,7 @@ public class Response {
         this.doc.append("res", 0);
         this.doc.append("message", errMsg);
         addException(this.doc, exc);
-        this.doc.append("route", this.request.route);
+        this.doc.append("route", this.request.getRoute());
         this.doc.append("request", this.request.pack());
         this.end();
         return this;

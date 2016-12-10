@@ -25,8 +25,8 @@ public class Database {
     private static String dbName = "mydb";
     private static Database instance = new Database();
 
-    public MongoClient client;
-    public MongoDatabase db;
+    private MongoClient client;
+    private MongoDatabase db;
 
     private Database() {
         ServerAddress address = new ServerAddress(Database.url, Database.port);
@@ -50,6 +50,14 @@ public class Database {
         this.db = this.client.getDatabase(dbName);
         this.setIndexes();
         return this;
+    }
+
+    public MongoDatabase getDB() {
+        return this.db;
+    }
+
+    public MongoClient getClient() {
+        return this.client;
     }
 
     private void setIndexes() {

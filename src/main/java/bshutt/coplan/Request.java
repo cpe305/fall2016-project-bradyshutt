@@ -8,10 +8,10 @@ import static org.bson.Document.parse;
 
 public class Request {
 
-    public String route = null;
-    public Document data = null;
-    public User user = null;
-    public Course course = null;
+    private String route = null;
+    private Document data = null;
+    private User user = null;
+    private Course course = null;
 
     public Request() { }
 
@@ -30,12 +30,32 @@ public class Request {
         return this.data.getString(key);
     }
 
+    public String getRoute() {
+        return this.route;
+    }
+
+    public Document getData() {
+        return data;
+    }
+
     public <T> T getData(String key, Class<T> type) {
         return this.data.get(key, type);
     }
 
     public boolean contains(String key) {
         return (this.data.containsKey(key));
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public User getUser() {
+        return this.user;
+    }
+
+    public Course getCourse() {
+        return this.course;
     }
 
     public Document pack() {

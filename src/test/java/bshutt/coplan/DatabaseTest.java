@@ -21,25 +21,7 @@ public class DatabaseTest extends TestCase {
   public void testDBRunning() throws Exception {
     Database db = Database.getInstance();
     assertNotNull(db);
-    assertNotNull(db.client);
-    assertNotNull(db.db);
+    assertNotNull(db.getClient());
+    assertNotNull(db.getDB());
   }
-
-  @Test
-  public void testDocInsertionDeletion1() throws Exception {
-
-  }
-
-  @Test
-  public void testGetDocument() throws Exception {
-  }
-
-  public void testSetPort() throws Exception {
-
-  }
-
-  public void testSetUrl() throws Exception {
-
-  }
-
 }
