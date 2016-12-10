@@ -23,14 +23,13 @@ public class Users {
             user = User.load(username);
             if (user == null) {
                 res.err("User '" + username + "' not found!");
-                return;
             } else {
                 res.append("user", user.toClientDoc());
                 res.end(true);
+                return;
             }
         } catch (Exception exc) {
-            res.append("Error loading user: " + exc.getMessage(), exc);
-            res.end(false);
+            res.err("Error loading user: " + exc.getMessage(), exc);
             return;
         }
     };
@@ -39,72 +38,16 @@ public class Users {
         res.append("user", req.user.toClientDoc());//.toClientDoc(true));
         res.end(true);
     };
-//        String jwt = null;
-//        try {
-//            jwt = req.user.getJwt();
-//        } catch (DatabaseException e) {
-//            res.err("DB error with getting the JWT", e);
-//        }
-//        boolean jwtIsValid = false;
-//        try {
-//            jwtIsValid = User.validateJwt(jwt);
-//        } catch (JwtException e) {
-//            res.err("Jwt error", e);
-//            return;
-//        }
-//
-//        if (!jwtIsValid) {
-//            res.append("errorMessage", "JWT not validated.");
-//            res.end(false);
-//        }
-//
-//        res.append("message", "JWT validated successfully.");
-//        try {
-//            res.append("courses", req.user.getCourseDetails());
-//        } catch (DatabaseException | CourseValidationException exc) {
-//            res.err("Error getting course details", exc);
-//            return;
-//        }
-//    };
-
-    public Handler getUserCourses = (req, res) -> {
-        ArrayList<Course> courses = req.user.getCourses();
-        ArrayList<Document> courseDocs = new ArrayList<>();
-        courses.forEach((course) -> courseDocs.add(course.toClientDoc()));
-        res.append("courses", req.user.getCourses());
-        res.end(true);
-    };
-
-    public Handler addPinToBoard = (req, res) -> {
-        String courseName = req.getData("courseName");
-        Course course = null;
-        try {
-            course = Course.load(courseName);
-        } catch (CourseValidationException | DatabaseException exc) {
-            res.err("error loading course", exc);
-            return;
-        }
-        Document pinDoc = req.getData("pin", Document.class);
-        Pin pin = Pin.fromDoc(pinDoc);
-
-        try {
-            course.addPin(pin);
-        } catch (DatabaseException | PinValidationException | PinParseException | PinSerializationException exc) {
-            res.err("error adding pin to course", exc);
-        }
-
-        res.append("course", course.toClientDoc());
-        res.end(true);
-    };
 
     public Handler createUser = (req, res) -> {
-        User user = new User().fromDoc(req.data);
-        if (!User.isUsernameAvailable(user.getUsername())) {
-            res.append("message", "Username '"+user.getUsername()+"' is not available.");
+        User user = new User();
+        user.deserialize(req.data);
+        if (!User.isUsernameAvailable(user.username)) {
+            res.append("message", "Username '"+user.username+"' is not available.");
             res.end(false);
             return;
         }
-        if (user.validate(user.toDBDoc())) {
+        if (user.validate(user.serialize())) {
             try {
                 user.save();
             } catch (DatabaseException exc) {
@@ -129,6 +72,35 @@ public class Users {
             res.err("Invalid data params for creating a user");
             return;
         }
+    };
+
+    public Handler getUserCourses = (req, res) -> {
+        ArrayList<Course> courses = req.user.courses;
+        ArrayList<Document> courseDocs = Course.toDocList(courses);
+        res.append("courses", courseDocs);
+        res.end(true);
+    };
+
+    public Handler addPinToBoard = (req, res) -> {
+        String courseName = req.getData("courseName");
+        Course course = null;
+        try {
+            course = Course.load(courseName);
+        } catch (CourseValidationException | DatabaseException exc) {
+            res.err("error loading course", exc);
+            return;
+        }
+        Document pinDoc = req.getData("pin", Document.class);
+        Pin pin = Pin.fromDoc(pinDoc);
+
+        try {
+            course.addPin(pin);
+        } catch (DatabaseException | PinValidationException | PinParseException | PinSerializationException exc) {
+            res.err("error adding pin to course", exc);
+        }
+
+        res.append("course", course.toClientDoc());
+        res.end(true);
     };
 
     public Handler removeUser = (req, res) -> {
@@ -203,6 +175,11 @@ public class Users {
 
     public Handler registerForCourse = (req, res) -> {
         User user = req.user;
+        System.out.println("USER COURES: {");
+        req.user.courses.forEach(course -> {
+            System.out.println("course: " + course);
+        });
+        System.out.println("}");
         Course course = null;
         try {
             course = Course.load(req.getData("courseName"));
@@ -214,15 +191,19 @@ public class Users {
             return;
         }
 
+
         try {
-            course.registerUser(user.getUsername());
+            course.registerUser(user.username);
         } catch (CourseRegistrationException exc) {
-            res.append("message", "User '" + user.getUsername()
+            res.append("message", "User '" + user.username
                     + "' is already registered for '"
                     + req.getData("courseName") + "'.");
             res.end(false);
             return;
         }
+
+
+        course.printDetails();
 
         try {
             user.registerForCourse(course);
@@ -231,7 +212,16 @@ public class Users {
             return;
         }
 
-        res.append("message", "User '" + user.getUsername()
+        Document usr = user.serialize();
+        System.out.println("## usr reg end" + usr.toJson());
+
+        try {
+            System.out.println("## loaded usr reg end" + User.load(user.username).serialize());
+        } catch (UserDoesNotExistException e) {
+            e.printStackTrace();
+        }
+
+        res.append("message", "User '" + user.username
                 + "' registered for course + '"
                 + req.getData("courseName") + "'.");
         //res.append("course", course.toClientDoc(true));
@@ -258,7 +248,7 @@ public class Users {
             res.err("Error unregistering for that course: " + exc.getMessage(), exc);
             return;
         }
-        res.append("message", "User '" + user.getUsername()
+        res.append("message", "User '" + user.username
                 + "' unregistered for courses '"
                 + req.getData("courseName") + "'.");
         //res.append("course", course.toClientDoc(true));
@@ -298,7 +288,7 @@ public class Users {
                 return;
             }
             res.append("jwt", newJwt);
-            res.append("user", req.user.toDBDoc());
+            res.append("user", req.user.serialize());
             res.end(true);
         } else {
             res.append("errorMessage", "The the old JWT did not match.");
@@ -329,4 +319,31 @@ public class Users {
 //        }
 //    }
 
+
+//        String jwt = null; //        try {
+//            jwt = req.user.getJwt();
+//        } catch (DatabaseException e) {
+//            res.err("DB error with getting the JWT", e);
+//        }
+//        boolean jwtIsValid = false;
+//        try {
+//            jwtIsValid = User.validateJwt(jwt);
+//        } catch (JwtException e) {
+//            res.err("Jwt error", e);
+//            return;
+//        }
+//
+//        if (!jwtIsValid) {
+//            res.append("errorMessage", "JWT not validated.");
+//            res.end(false);
+//        }
+//
+//        res.append("message", "JWT validated successfully.");
+//        try {
+//            res.append("courses", req.user.getCourseDetails());
+//        } catch (DatabaseException | CourseValidationException exc) {
+//            res.err("Error getting course details", exc);
+//            return;
+//        }
+//    };
 

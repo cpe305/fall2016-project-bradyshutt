@@ -71,8 +71,8 @@ public class Request {
     }
 
     public String toString() {
-        String str = "Request for '" + this.route
-                + "\n\tData: " + this.data.toJson();
+        String str = "<REQUEST ["+this.route+"]> \n"+
+                "\tData: {" + this.data.toJson()+"}";
         return str;
     }
 

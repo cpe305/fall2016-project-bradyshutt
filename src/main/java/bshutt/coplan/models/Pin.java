@@ -3,9 +3,11 @@ package bshutt.coplan.models;
 import bshutt.coplan.exceptions.PinValidationException;
 import org.bson.Document;
 
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 
-public class Pin {
+public class Pin implements Serializable {
     private String name;
     private String content;
     private Date createDate;
@@ -58,7 +60,7 @@ public class Pin {
         return pin;
     }
 
-    public Document toDoc() {
+    public Document tzoDoc() {
         Document doc = new Document();
         doc.append("pinName", this.name);
         doc.append("createDate", this.createDate.toString());
@@ -77,5 +79,34 @@ public class Pin {
 
     public String toString() {
         return "Pin: { " + this.getName() + ", " + this.getContent() + " }";
+    }
+
+    public Document serialize() {
+        Document doc = new Document();
+        doc.append("pinName", this.name);
+        doc.append("createDate", this.createDate.toString());
+        if (this.deadline != null)
+            doc.append("deadline", this.deadline.toString());
+        else
+            doc.append("deadline", null);
+        doc.append("content", this.content);
+        return doc;
+    }
+
+    public static ArrayList<Pin> toPinList(ArrayList<Document> docs) {
+        ArrayList<Pin> pins = new ArrayList<>();
+        docs.forEach((doc) -> {
+            Pin pin = Pin.fromDoc(doc);
+            pins.add(pin);
+        });
+        return pins;
+    }
+
+    public static ArrayList<Document> toDocList(ArrayList<Pin> pins) {
+        ArrayList<Document> docs = new ArrayList<>();
+        pins.forEach((pin) -> {
+            docs.add(pin.serialize());
+        });
+        return docs;
     }
 }

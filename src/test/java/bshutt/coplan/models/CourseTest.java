@@ -19,7 +19,6 @@ public class CourseTest {
         //Database.getInstance().db.drop();
     }
 
-
     @Test
     public void testCreateAndLoadCourse() throws Exception {
 //        String courseName = "CPE-305";

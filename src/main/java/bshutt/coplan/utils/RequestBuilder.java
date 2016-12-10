@@ -21,6 +21,11 @@ public class RequestBuilder {
         return this;
     }
 
+    public RequestBuilder addData(Document doc) {
+        this.data = doc;
+        return this;
+    }
+
     public Request done() {
         return new Request(this.route, this.data);
     }

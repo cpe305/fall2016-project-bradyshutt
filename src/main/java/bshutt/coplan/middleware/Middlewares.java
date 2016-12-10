@@ -24,6 +24,10 @@ public class Middlewares {
         }
     };
 
+    public Middleware loadUsersCourses = (req, res) -> {
+
+    };
+
 //    public Middleware loadCourse = (req, res) -> {
 //        String courseName = req.getData("courseName");
 //        if (courseName == null) {

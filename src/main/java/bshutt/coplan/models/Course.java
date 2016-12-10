@@ -13,9 +13,8 @@ public class Course extends Model<Course> {
     private static final String filterKey = "courseName";
 
     public String courseName;
-    private ArrayList<String> registeredUsers;
-    //private String serializedPins;
-    private ArrayList<Pin> pins;
+    public ArrayList<String> registeredUsers;
+    public ArrayList<Pin> pins;
 
 
     public Course() {
@@ -24,16 +23,16 @@ public class Course extends Model<Course> {
 
     public static Course load(String courseName) throws CourseValidationException, DatabaseException {
         Course course = Course.loadOrCreateCourse(courseName);
+        System.out.println("Loaded course <" + course.courseName + "> successfully." + course.toString());
         return course;
     }
 
     public static Course createNewCourse(String courseName) throws CourseValidationException, DatabaseException {
         Course course = new Course();
-        course.setCourseName(courseName);
-        //course.serializedPins = JSON.serialize(new ArrayList<Pin>());
+        course.courseName = courseName;
         course.pins = new ArrayList<>();
         course.registeredUsers = new ArrayList<>();
-        if (!course.validate(course.toDBDoc())) {
+        if (!course.validate(course.serialize())) {
             System.out.println("not valid!");
             throw new CourseValidationException();
         }
@@ -48,7 +47,7 @@ public class Course extends Model<Course> {
         if (rawDocument == null) {
             course = Course.createNewCourse(courseName);
         } else {
-            course.fromDoc(rawDocument);
+            course.deserialize(rawDocument);
         }
         return course;
     }
@@ -65,40 +64,39 @@ public class Course extends Model<Course> {
     }
 
 
-    @Override
-    public Document toDBDoc() {
-        Document doc = new Document();
-        doc.append("courseName", this.courseName);
-        doc.append("registeredUsers", this.registeredUsers);
-        //doc.append("serializedPins", this.serializedPins);
+//    @Override
+//    public Document toDxBDoc() {
+//        Document doc = new Document();
+//        doc.append("courseName", this.courseName);
+//        doc.append("registeredUsers", this.registeredUsers);
+//        doc.append("pins", Pin.pinsToDocs(this.pins));
+//        return doc;
+//    }
 
-        ArrayList<Document> pinDocs = new ArrayList<>();
-        this.pins.forEach((pin) -> pinDocs.add(pin.toDoc()));
-        doc.append("pins", pinDocs);
+    public Document toClientDoc() {
+        Document doc = this.serialize();
+        //filter some if necesarry
         return doc;
     }
-    public Document toClientDoc() {
-        return this.toDBDoc();
-    }
 
-    @Override
-    public Course fromDoc(Document courseDoc) {
-        this.courseName = courseDoc.getString("courseName");
-        if (this.courseName == null) {
-            return null;
-        } else {
-            this.registeredUsers = (courseDoc.containsKey("registeredUsers")
-                    ? courseDoc.get("registeredUsers", ArrayList.class)
-                    : new ArrayList<String>());
-//            this.serializedPins = (courseDoc.containsKey("serializedPins")
-//                    ? courseDoc.getString("jsonPins")
-//                    : JSON.serialize(new ArrayList<Pin>()));
-            this.pins = (courseDoc.containsKey("pins")
-                    ? courseDoc.get("pins", ArrayList.class)
-                    : new ArrayList<>());
-            return this;
-        }
-    }
+//    @Override
+//    public Course fromDoc(Document courseDoc) {
+//        this.courseName = courseDoc.getString("courseName");
+//        if (this.courseName == null) {
+//            return null;
+//        } else {
+//            this.registeredUsers = (courseDoc.containsKey("registeredUsers")
+//                    ? courseDoc.get("registeredUsers", ArrayList.class)
+//                    : new ArrayList<String>());
+////            this.serializedPins = (courseDoc.containsKey("serializedPins")
+////                    ? courseDoc.getString("jsonPins")
+////                    : JSON.serialize(new ArrayList<Pin>()));
+//            this.pins = (courseDoc.containsKey("pins")
+//                    ? courseDoc.get("pins", ArrayList.class)
+//                    : new ArrayList<>());
+//            return this;
+//        }
+//    }
 
     public static boolean exists(String courseName) {
         Database db = Database.getInstance();
@@ -143,18 +141,6 @@ public class Course extends Model<Course> {
         this.save();
     }
 
-    public ArrayList getRegisteredUsers() {
-        return this.registeredUsers;
-    }
-
-    public String getCourseName() {
-        return courseName;
-    }
-
-    public void setCourseName(String courseName) {
-        this.courseName = courseName;
-    }
-
     //public void updatePins(PinsUpdater pinsUpdater) throws PinParseException, PinSerializationException {
 //        String serializedPins = this.serializedPins;
 //        ArrayList<Pin> pins;
@@ -174,9 +160,61 @@ public class Course extends Model<Course> {
 //        this.serializedPins = newSerializedPins;
    // }
 
-    public String toString() {
-        return "Course: { " + this.getCourseName() + ", " + this.getRegisteredUsers() + " }";
 
+    public static ArrayList<Course> toCourseList(ArrayList<Document> documents) {
+        ArrayList<Course> courses = new ArrayList<>();
+        documents.forEach(document -> {
+            Course course = new Course();
+            courses.add(course.deserialize(document));
+        });
+        return courses;
+    }
+
+    public static ArrayList<Document> toDocList(ArrayList<Course> courses) {
+        ArrayList<Document> documents = new ArrayList<>();
+        courses.forEach(course -> {
+            course.printDetails();
+            Document doc = course.serialize();
+            documents.add(doc);
+        });
+        return documents;
+    }
+
+    @Override
+    public Document serialize() {
+        Document doc = new Document();
+        doc.append("courseName", this.courseName);
+        doc.append("registeredUsers", this.registeredUsers);
+        doc.append("pins", Pin.toDocList(this.pins));
+        return doc;
+    }
+
+    public Course deserialize(Document doc) {
+        this.courseName = doc.getString("courseName");
+        this.registeredUsers = doc.get("registeredUsers", ArrayList.class);
+        ArrayList<Document> pinDocs = doc.get("pins", ArrayList.class);
+        this.pins = Pin.toPinList(pinDocs);
+        return null;
+    }
+
+    public String toString() {
+        return "<" + this.courseName + ">";
+    }
+
+    public void printDetails() {
+
+        final String[] usersString = {"\n"};
+        this.registeredUsers.forEach(user -> usersString[0] +="\t\t\t'"+user+"'\n");
+        usersString[0] +="\t\t";
+
+        final String[] pinsString = {"\n"};
+        this.pins.forEach(pin -> pinsString[0] +="\t\t\t'"+pin.toString()+"'\n");
+        pinsString[0] +="\t\t";
+
+        String s = "Details for Course <"+this.courseName+">: {\n" +
+                "\t\tregisteredUsers: [" + usersString[0] + "]\n" +
+                "\t\tpins: [" + pinsString[0] + "]\n";
+        System.out.println("\n\n"+s+"\n\n");
     }
 }
 
